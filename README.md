@@ -29,7 +29,7 @@ Modify global settings, including the total key count, the measurement frequency
 
 ## Built-in blueprints
 
-A "blueprint" is a combination of a key type, value type, hash function, comparison function, and key set against which to test each map.
+A "blueprint" is a combination of a key type, value type, hash function, comparison function, and key set against which to measure each map's performance.
 
 Three blueprints are included out-of-the-box:
 
@@ -57,38 +57,39 @@ To add a new map, follow these steps:
 
     ```c
     static constexpr const char *label =
-      /* a string literal containing the label of the map to appear in the outputted graphs */
+      // A string literal containing the label of the map to appear in the outputted graphs.
     ;
  
     static constexpr const char *color =
-      /* a string literal containing the color of the map's label and plot to appear in the outputted graphs,
-      e.g. rgb( 255, 0, 0 ). */
+      // A string literal containing the color of the map's label and plot to appear in the outputted graphs,
+      // e.g. rgb( 255, 0, 0 ).
     ;
     ```
 
-    For each blueprint, `new_ship< blueprint >` should provide the following member functions, where "blueprint" is the name of the blueprint, "map_type" is the map type for that blueprint, and "itr_type" is the type of the associated iterator:
+    For each blueprint, `new_ship< blueprint >` should provide the following member functions, where `blueprint` is the name of the blueprint, `map_type` is the map type for that blueprint, and `itr_type` is the type of the associated iterator:
 
-static map_type create_map()
-{
-  // Returns an initialized instance of a map that uses blueprint::hash_key as the hash function,
-  // blueprint::cmpr_keys as the comparison function, and MAX_LOAD_FACTOR as the maximum load factor.
-}
+    ```c
+    static map_type create_map()
+    {
+      // Returns an initialized instance of a map that uses blueprint::hash_key as the hash function,
+      // blueprint::cmpr_keys as the comparison function, and MAX_LOAD_FACTOR as the maximum load factor.
+    }
+    
+    static void insert( map_type &map, const blueprint::key_type &key )
+    {
+      // Inserts the specified key, along with a dummy value, into the map, replacing any matching key already in the map if it exists.
+    }
 
-static void insert( map_type &map, const blueprint::key_type &key )
-{
-  // Inserts the specified key, along with a dummy value, into the map, replacing any matching key already in the map if it exists.
-}
-
-static void erase( map_type &map, const blueprint::key_type &key )
-{
-  // Erases the specified key and associated value from the map, if the key exists.
-}
-
-static itr_type find( map_type &map, const blueprint::key_type &key )
-{
-  // Returns an iterator to the specified key and associated value, if the key exists,
-  // or an iterator indicating a nonexistent key (e.g. an end iterator, for maps that follow the std::unordered_map API), if the key does not exist.
-}
+    static void erase( map_type &map, const blueprint::key_type &key )
+    {
+      // Erases the specified key and associated value from the map, if the key exists.
+    }
+    
+    static itr_type find( map_type &map, const blueprint::key_type &key )
+    {
+      // Returns an iterator to the specified key and associated value, if the key exists,
+      // or an iterator indicating a nonexistent key (e.g. an end iterator, for maps that follow the std::unordered_map API), if the key does not exist.
+    }
 
 static itr_type begin_itr( map_type &map )
 {
