@@ -57,15 +57,16 @@ To add a new map, follow these steps:
 
     ```c
     static constexpr const char *label =
-      /* a string literal containing the label of the map to appear in the outputted graphs */;
-    ```
-
-    ```c
+      /* a string literal containing the label of the map to appear in the outputted graphs */
+    ;
+ 
     static constexpr const char *color =
-      /* a string literal containing the color of the map's label and plot to appear in the outputted graphs, e.g. rgb( 255, 0, 0 ). */;
+      /* a string literal containing the color of the map's label and plot to appear in the outputted graphs,
+      e.g. rgb( 255, 0, 0 ). */
+    ;
     ```
 
-    For each blueprint, our_shim< blueprint > should provide the following member functions, where "blueprint" is the name of the blueprint, "map_type" is the map type for that blueprint, and "itr_type" is the type of the associated itr:
+    For each blueprint, `new_ship< blueprint >` should provide the following member functions, where "blueprint" is the name of the blueprint, "map_type" is the map type for that blueprint, and "itr_type" is the type of the associated iterator:
 
 static map_type create_map()
 {
