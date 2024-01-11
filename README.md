@@ -8,7 +8,7 @@ An example of the output can be found [here].
 To install:
 
 - Download and extract the repository.
-- Install [Boost](...), or disable the `boost_unordered_flat_map` shim by editing `config.h`.
+- Install [Boost](https://www.boost.org/), or disable the `boost_unordered_flat_map` shim by editing `config.h`.
 
 ## Compiling
 
