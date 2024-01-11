@@ -17,7 +17,7 @@ For GCC or Clang, compile with `...` or `...` from the master directory.
 
 ## Running
 
-Close background processes, lock your CPU's frequency, and then run the executable. Under the out-of-the-box configuration, the benchmarks take about !!!! to complete an on AMD Ryzen 7 5800H with the CPU frequency locked at 90%.
+Close background processes, lock your CPU's frequency, and then run the executable. Under the out-of-the-box configuration, the benchmarks take about !!!! to complete on my AMD Ryzen 7 5800H with the CPU frequency locked at 90%.
 
 The resulting graphs are outputted to the `results` directory as a HMTL file named with a GMT timestamp.
 
@@ -61,23 +61,25 @@ To add a new map, follow these steps:
     ;
  
     static constexpr const char *color =
-      // A string literal containing the color of the map's label and plot to appear in the outputted graphs,
-      // e.g. rgb( 255, 0, 0 ).
+      // A string literal containing the color of the map's label and plot to appear in the outputted
+      //graphs, e.g. rgb( 255, 0, 0 ).
     ;
     ```
 
-    For each blueprint, `new_ship< blueprint >` should provide the following member functions, where `blueprint` is the name of the blueprint, `map_type` is the map type for that blueprint, and `itr_type` is the type of the associated iterator:
+    For each blueprint, `new_shim< blueprint >` should provide the following member functions, where `blueprint` is the name of the blueprint, `map_type` is the map type for that blueprint, and `itr_type` is the type of the associated iterator:
 
     ```c
     static map_type create_map()
     {
       // Returns an initialized instance of a map that uses blueprint::hash_key as the hash function,
-      // blueprint::cmpr_keys as the comparison function, and MAX_LOAD_FACTOR as the maximum load factor.
+      // blueprint::cmpr_keys as the comparison function, and MAX_LOAD_FACTOR as the maximum load
+      // factor.
     }
     
     static void insert( map_type &map, const blueprint::key_type &key )
     {
-      // Inserts the specified key, along with a dummy value, into the map, replacing any matching key already in the map if it exists.
+      // Inserts the specified key, along with a dummy value, into the map, replacing any matching
+      // key already in the map if it exists.
     }
 
     static void erase( map_type &map, const blueprint::key_type &key )
@@ -88,39 +90,44 @@ To add a new map, follow these steps:
     static itr_type find( map_type &map, const blueprint::key_type &key )
     {
       // Returns an iterator to the specified key and associated value, if the key exists,
-      // or an iterator indicating a nonexistent key (e.g. an end iterator, for maps that follow the std::unordered_map API), if the key does not exist.
+      // or an iterator indicating a nonexistent key (e.g. an end iterator, for maps that follow the
+      // std::unordered_map API), if the key does not exist.
+    }
+    
+    static itr_type begin_itr( map_type &map )
+    {
+      // Returns an iterator to the first key and associated value in the map, or an iterator
+      // indicating a nonexistent key if the map is empty.
+    }
+    
+    static bool is_itr_valid( map_type &map, itr_type &itr )
+    {
+      // Returns true if the specified iterator points to a key inside the map.
     }
 
-static itr_type begin_itr( map_type &map )
-{
-  // Returns an iterator to the first key and associated value in the map, or an iterator indicating a nonexistent key if the map is empty.
-}
-
-static bool is_itr_valid( map_type &map, itr_type &itr )
-{
-  // Returns true if the specified iterator points to a key inside the map.
-}
-
-static void increment_itr( map_type &map, itr_type &itr )
-{
-  // Increments the specified iterator to point to the next key in the map, or an iterator indicating a nonexistent key if key to which the iterator currently points is the last one in the map.
-}
-
-static blueprint::key_type &get_key_from_itr( map_type &map, itr_type &itr )
-{
-  // Returns a reference to the key pointed to by the specified iterator.
-}
-
-static blueprint::value_type &get_value_from_itr( map_type &map, itr_type &itr )
-{
-  // Returns a reference to the value pointed to by the specified iterator.
-}
-
-static void destroy_map( map_type &map )
-{
-  // Frees all memory associated with the map.
-  // For C++ maps, if freeing memory is handled by map_type's destructor, this function can be left empty.
-}
+    static void increment_itr( map_type &map, itr_type &itr )
+    {
+      // Increments the specified iterator to point to the next key in the map, or an iterator
+      // indicating a nonexistent key if key to which the iterator currently points is the last one
+      // in the map.
+    }
+    
+    static blueprint::key_type &get_key_from_itr( map_type &map, itr_type &itr )
+    {
+      // Returns a reference to the key pointed to by the specified iterator.
+    }
+    
+    static blueprint::value_type &get_value_from_itr( map_type &map, itr_type &itr )
+    {
+      // Returns a reference to the value pointed to by the specified iterator.
+    }
+    
+    static void destroy_map( map_type &map )
+    {
+      // Frees all memory associated with the map.
+      // For C++ maps, if freeing memory is handled by map_type's destructor, this function can be
+      // left empty.
+    }
 
 Refer to the built-in shims for examples of how a shim can be implemented for C++ maps that follow the std::unordered_map API and for C maps, which typically require explicit template specializations for each blueprint.
 
