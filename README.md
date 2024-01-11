@@ -43,11 +43,14 @@ Three blueprints are included out-of-the-box:
 
 Each hash map library plugs into the benchmarks via a custom "shim" that provides a standard interface for basic hash map operations.
 
-To add a new map:
+To add a new map, follow these steps:
 
-1. Create a directory, with your chosen name for the shim, in the `shims` directory.
+1. Create a directory, with your chosen name for the shim, in the `shims` directory and, ideally, install the hash map library's headers there.
+
 2. Create a file name `shim.h` in the new directory.
+
 3. Insert the name of the shim to an empty shim slot in `config.h`.
+
 4. In `shim.h`, define a struct template with the name of the shim (`new_shim` in the below documentation) and that satisfies the following requirements:
 
 `new_shim< void >` should provide the following members:
