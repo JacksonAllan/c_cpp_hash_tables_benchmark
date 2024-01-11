@@ -27,7 +27,7 @@ The graphs are interactive. Hover over a label to highlight the associated plot,
 
 Modify global settings, including the total key count, the measurement frequency, the maximum load factor, and the blueprints and shims (see below) enabled by editing `config.h`.
 
-## Included blueprints
+## Built-in blueprints
 
 A "blueprint" is a combination of a key type, value type, hash function, comparison function, and key set against which to test each map.
 
@@ -39,7 +39,7 @@ Three blueprints are included out-of-the-box:
 
 - The "16-char string key, 64-bit value" blueprint tests how the maps perform when the hash function and key comparison function are expensive. This blueprint disadvantages maps that lack a (metadata) mechanism to avoid most key comparisons or that rehash existing keys often.
 
-## Adding new maps via shims
+## Adding a new map (via a shim)
 
 Each hash map library plugs into the benchmarks via a custom "shim" that provides a standard interface for basic hash map operations.
 
@@ -53,16 +53,19 @@ To add a new map, follow these steps:
 
 4. In `shim.h`, define a struct template with the name of the shim (`new_shim` in the below documentation) and that satisfies the following requirements:
 
-`new_shim< void >` should provide the following members:
+    `new_shim< void >` should provide the following members:
 
-```
-static constexpr const char *label = /* a string literal containing the label of the map to appear in the outputted graphs */;
-```
+    ```c
+    static constexpr const char *label =
+      /* a string literal containing the label of the map to appear in the outputted graphs */;
+    ```
 
-// The color of the map's label and plot to appear in the outputed graphs.
-static constexpr const char *color = "rgb( 250, 0, 0 )";
+    ```c
+    static constexpr const char *color =
+      /* a string literal containing the color of the map's label and plot to appear in the outputted graphs, e.g. rgb( 255, 0, 0 ). */;
+    ```
 
-For each blueprint, our_shim< blueprint > should provide the following member functions, where "blueprint" is the name of the blueprint, "map_type" is the map type for that blueprint, and "itr_type" is the type of the associated itr:
+    For each blueprint, our_shim< blueprint > should provide the following member functions, where "blueprint" is the name of the blueprint, "map_type" is the map type for that blueprint, and "itr_type" is the type of the associated itr:
 
 static map_type create_map()
 {
