@@ -1,6 +1,7 @@
 ## Introduction
 
 This repository contains an extendible, comparative benchmark of C and C++ hash map libraries.
+
 An example of the output can be found [here].
 
 ## Installing
