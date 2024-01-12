@@ -6,10 +6,9 @@ An example of the output can be found [here].
 
 ## Installing
 
-To install:
+1. Download and extract the repository.
 
-- Download and extract the repository.
-- Install [Boost](https://www.boost.org/), or disable the `boost_unordered_flat_map` shim by editing `config.h`.
+2. Install [Boost](https://www.boost.org/) if necessary, or disable the `boost_unordered_flat_map` shim by editing `config.h`.
 
 ## Compiling
 
@@ -17,7 +16,7 @@ For GCC or Clang, compile with `...` or `...` from the master directory.
 
 ## Running
 
-Close background processes, lock your CPU's frequency, and then run the executable. Under the out-of-the-box configuration, the benchmarks take about !!!! to complete on my AMD Ryzen 7 5800H with the CPU frequency locked at 90%.
+Close background processes, lock your CPU's frequency, and then run the executable. Under the out-of-the-box configuration, the benchmarks take approximately !!!! to complete on my AMD Ryzen 7 5800H with the CPU frequency locked at 90%.
 
 The resulting graphs are outputted to the `results` directory as a HMTL file named with a GMT timestamp.
 
@@ -148,9 +147,13 @@ To add a new blueprint, follow these steps:
       // A string literal containing the label of the blueprint toappear in the outputted graphs.
     ;
     
-    using key_type = /* the type of the keys that the maps should contain */;
+    using key_type =
+      // The type of the keys that the maps should contain.
+    ;
     
-    using value_type = /* the value associated with each key */;
+    using value_type =
+      // The value associated with each key.
+    ;
     
     static uint64_t hash_key( const key_type &key )
     {
