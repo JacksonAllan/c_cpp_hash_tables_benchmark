@@ -172,7 +172,7 @@ To add a new blueprint, follow these steps:
     }
     ```
 
-`blueprint.h` should also declare a suitably named macro (e.g. `NEW_SHIM_ENABLED`) that allows each shim to use the preprocessor to optionally disclude a specialization for the blueprint.
+    `blueprint.h` should also declare a suitably named macro (e.g. `NEW_SHIM_ENABLED`) that allows each shim to use the preprocessor to optionally disclude a specialization for the blueprint.
 
 5. Ensure that each shim supports the new blueprint struct as a template argument (either via the base template or via an explicit template specialization).
 
