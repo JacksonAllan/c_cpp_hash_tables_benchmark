@@ -53,9 +53,9 @@ To add a new map, follow these steps:
 
 4. In `shim.h`, define a struct template with the name of the shim (`new_shim` in the below documentation) and that satisfies the following requirements:
 
-    `new_shim< void >` should provide the following members:
+    `new_shim< void >` should contain these members:
 
-    ```c
+    ```c++
     static constexpr const char *label =
       // A string literal containing the label of the map to appear in the outputted graphs.
     ;
@@ -66,9 +66,9 @@ To add a new map, follow these steps:
     ;
     ```
 
-    For each blueprint, `new_shim< blueprint >` should provide the following member functions, where `blueprint` is the name of the blueprint, `map_type` is the map type for that blueprint, and `itr_type` is the type of the associated iterator:
+    For each blueprint, `new_shim< blueprint >` should contain the following members, where `blueprint` is the name of the blueprint, `map_type` is the map type for that blueprint, and `itr_type` is the type of the associated iterator:
 
-    ```c
+    ```c++
     static map_type create_map()
     {
       // Returns an initialized instance of a map that uses blueprint::hash_key as the hash function,
@@ -129,42 +129,44 @@ To add a new map, follow these steps:
       // left empty.
     }
 
-Refer to the built-in shims for examples of how a shim can be implemented for C++ maps that follow the std::unordered_map API and for C maps, which typically require explicit template specializations for each blueprint.
+Refer to the built-in shims for examples of how a shim can be implemented for C++ maps that follow the `std::unordered_map` API and for C maps, which typically require explicit template specializations for each blueprint.
 
-## Adding new blueprints
+## Adding a new blueprint
 
-To add a new blueprint:
+To add a new blueprint, follow these steps:
 
 1. Create a directory with your chosen name for the blueprint in the `blueprint` directory.
 
 2. Create a file name `blueprint.h` in the new directory.
 
-3. Insert the name of the blueprint to an empty `#define BLUEPRINT_<N>` slot in `config.h`.
+3. Insert the name of the blueprint into an empty blueprint slot in `config.h`.
 
-4. In `blueprint.h`, define a struct with the name of the blueprint (`blueprint` below) and that contains the following members:
+4. In `blueprint.h`, define a struct with the name of the blueprint that contains the following members:
 
-static constexpr const char *label = /* a string literal containing the label of the blueprint to appear in the outputted graphs */;
+    ```c++
+    static constexpr const char *label =
+      // A string literal containing the label of the blueprint toappear in the outputted graphs.
+    ;
+    
+    using key_type = /* the type of the keys that the maps should contain */;
+    
+    using value_type = /* the value associated with each key */;
+    
+    static uint64_t hash_key( const key_type &key )
+    {
+      // Returns the hash code of the specified key.
+    }
+    
+    bool cmpr_keys( const key_type &key_1, const key_type &key_2 )
+    {
+      // Returns true if the two specified keys are equal.
+    }
+    ```
 
-using key_type = /* the type of the keys that the maps should contain */;
-
-using value_type = /* the value associated with each key */;
-
-static uint64_t hash_key( const key_type &key )
-{
-  // Returns the hash code of the specified key.
-}
-
-bool cmpr_keys( const key_type &key_1, const key_type &key_2 )
-{
-  // Returns true if the two specified keys are equal.
-}
-
-`blueprint.h` should also declare a suitably named macro (e.g. `NEW_SHIM_ENABLE`) that enables each shim to use the preprocessor to optionally disclude a specialization for the blueprint.
+`blueprint.h` should also declare a suitably named macro (e.g. `NEW_SHIM_ENABLED`) that allows each shim to use the preprocessor to optionally disclude a specialization for the blueprint.
 
 5. Ensure that each shim supports the new blueprint struct as a template argument (either via the base template or via an explicit template specialization).
 
 ## Sharing results
 
-The SVG embedded in the outputted HTML file are self-contained, so they can be trivially extracted and turned into standalone SVG files or embedded into other HTML files.
-
-They can even be used in GitHub READMEs (via ...), albeit without the interactive features.
+The graphs embedded in the outputted HTML file are self-contained SVGs, so they can be trivially extracted and turned into standalone SVG files or embedded into other HTML files. They can even be used in GitHub READMEs (via `<img src="./graph.svg">`), albeit without the interactive features.
