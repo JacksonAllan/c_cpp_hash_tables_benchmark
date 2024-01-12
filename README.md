@@ -16,7 +16,7 @@ Complete examples can be found !!![here].
 
 ## Compiling
 
-For GCC, compile with `g++ -I. -std=c++20 -O3 -Wall -Wpedantic main.cpp` from the master directory.
+Using GCC, compile with `g++ -I. -std=c++20 -O3 -Wall -Wpedantic main.cpp` from the master directory.
 
 ## Running
 
