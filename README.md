@@ -48,7 +48,7 @@ Three blueprints are included out-of-the-box:
 
  - The `uint64_struct448_murmur` blueprint (_64-bit integer key, 448-bit value_) tests how the maps perform when the hash function and key comparison function are cheap, traversing buckets is expensive (typically a cache miss per bucket), and moving keys and values is expensive. This blueprint disadvantages maps that do not store metadata in a separate array (or do but access the buckets array with every probe anyway to check the key) and that move elements around often (e.g. Robin Hood).
 
-- The `cstring_uint64_fnv1a` (_16-char string key, 64-bit value_) blueprint tests how the maps perform when the hash function and key comparison function are expensive. This blueprint disadvantages maps that lack a (metadata) mechanism to avoid most key comparisons or that rehash existing keys often.
+- The `cstring_uint64_fnv1a` (_16-char c-string key, 64-bit value_) blueprint tests how the maps perform when the hash function and key comparison function are expensive. This blueprint disadvantages maps that lack a (metadata) mechanism to avoid most key comparisons or that rehash existing keys often.
 
 ## Adding a new map (via a shim)
 
