@@ -1,6 +1,6 @@
 ## Introduction
 
-This repository contains an extendible, comparative benchmarking suite for C and C++ hash map libraries.
+This repository contains a comparative, extendible benchmarking suite for C and C++ hash map libraries.
 
 The benchmarks test the speed of inserting keys, replacing keys, looking up existing keys, look up nonexisting keys, deleting existing keys, deleting nonexisting keys, and iteration.
 
