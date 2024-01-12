@@ -32,21 +32,27 @@ The graphs are interactive. Hover over a label to highlight the associated plot,
 
 Modify global settings, including the total key count, the measurement frequency, the maximum load factor, and the blueprints and shims (see below) enabled by editing `config.h`.
 
+## Built-in maps
+
+The following hash map libraries are included out-of-the-box:
+
+* TODO ONCE FINALIZED
+
 ## Built-in blueprints
 
-A "blueprint" is a combination of a key type, value type, hash function, comparison function, and key set against which to measure each map's performance.
+A _blueprint_ is a combination of a key type, value type, hash function, comparison function, and key set against which to measure each map's performance.
 
 Three blueprints are included out-of-the-box:
 
-- The "32-bit integer key, 32-bit value" blueprint (`uint32_uint32_murmur`) tests how the maps perform when the hash function and key comparison function are cheap, traversing buckets is cheap (i.e. does not cause many cache misses), and moving keys and values is cheap. This blueprint disadvantages maps that store metadata in a separate array because doing so necessarily causes at least one extra cache miss per lookup.
+- The `uint32_uint32_murmur` blueprint (_32-bit integer key, 32-bit value_) tests how the maps perform when the hash function and key comparison function are cheap, traversing buckets is cheap (i.e. does not cause many cache misses), and moving keys and values is cheap. This blueprint disadvantages maps that store metadata in a separate array because doing so necessarily causes at least one extra cache miss per lookup.
 
- - The "64-bit integer key, 448-bit value" blueprint (`uint64_struct448_murmur`) tests how the maps perform when the hash function and key comparison function are cheap, traversing buckets is expensive (typically a cache miss per bucket), and moving keys and values is expensive. This blueprint disadvantages maps that do not store metadata in a separate array (or do but access the buckets array with every probe anyway to check the key) and that move elements around often (e.g. Robin Hood).
+ - The `uint64_struct448_murmur` blueprint (_64-bit integer key, 448-bit value_) tests how the maps perform when the hash function and key comparison function are cheap, traversing buckets is expensive (typically a cache miss per bucket), and moving keys and values is expensive. This blueprint disadvantages maps that do not store metadata in a separate array (or do but access the buckets array with every probe anyway to check the key) and that move elements around often (e.g. Robin Hood).
 
-- The "16-char string key, 64-bit value" (`cstring_uint64_fnv1a`) blueprint tests how the maps perform when the hash function and key comparison function are expensive. This blueprint disadvantages maps that lack a (metadata) mechanism to avoid most key comparisons or that rehash existing keys often.
+- The `cstring_uint64_fnv1a` (_16-char string key, 64-bit value_) blueprint tests how the maps perform when the hash function and key comparison function are expensive. This blueprint disadvantages maps that lack a (metadata) mechanism to avoid most key comparisons or that rehash existing keys often.
 
 ## Adding a new map (via a shim)
 
-Each hash map library plugs into the benchmarks via a custom "shim" that provides a standard API for basic hash map operations.
+Each hash map library plugs into the benchmarks via a custom _shim_ that provides a standard API for basic hash map operations.
 
 To add a new map, follow these steps:
 
