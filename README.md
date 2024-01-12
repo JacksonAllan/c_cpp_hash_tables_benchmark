@@ -2,7 +2,7 @@
 
 This repository contains an extendible, comparative benchmarking suite for C and C++ hash map libraries.
 
-The benchmarks test the speed of inserting keys, replacing keys, looking up existing keys, look up nonexistent keys, deleting existing keys, deleting nonexistent keys, and iteration.
+The benchmarks test the speed of inserting keys, replacing keys, looking up existing keys, look up nonexisting keys, deleting existing keys, deleting nonexisting keys, and iteration.
 
 The following is an example of one outputted graph:
 
@@ -101,14 +101,14 @@ To add a new map, follow these steps:
     static itr_type find( map_type &map, const blueprint::key_type &key )
     {
       // Returns an iterator to the specified key and associated value, if the key exists,
-      // or an iterator indicating a nonexistent key (e.g. an end iterator, for maps that follow the
+      // or an iterator indicating a nonexisting key (e.g. an end iterator, for maps that follow the
       // std::unordered_map API), if the key does not exist.
     }
     
     static itr_type begin_itr( map_type &map )
     {
       // Returns an iterator to the first key and associated value in the map, or an iterator
-      // indicating a nonexistent key if the map is empty.
+      // indicating a nonexisting key if the map is empty.
     }
     
     static bool is_itr_valid( map_type &map, itr_type &itr )
@@ -119,7 +119,7 @@ To add a new map, follow these steps:
     static void increment_itr( map_type &map, itr_type &itr )
     {
       // Increments the specified iterator to point to the next key in the map, or an iterator
-      // indicating a nonexistent key if key to which the iterator currently points is the last one
+      // indicating a nonexisting key if key to which the iterator currently points is the last one
       // in the map.
     }
     
@@ -178,7 +178,7 @@ To add a new blueprint, follow these steps:
     }
     ```
 
-    `blueprint.h` should also declare a suitably named macro (e.g. `NEW_SHIM_ENABLED`) that allows each shim to use the preprocessor to optionally disclude a specialization for the blueprint.
+    `blueprint.h` should also declare a suitably named macro (e.g. `NEW_SHIM_ENABLED`) that allows each shim to use the preprocessor to optionally exclude a specialization for the blueprint.
 
 5. Ensure that each shim supports the new blueprint struct as a template argument (either via the base template or via an explicit template specialization).
 
