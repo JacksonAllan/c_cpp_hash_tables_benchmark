@@ -40,7 +40,7 @@ Three blueprints are included out-of-the-box:
 
 ## Adding a new map (via a shim)
 
-Each hash map library plugs into the benchmarks via a custom "shim" that provides a standard interface for basic hash map operations.
+Each hash map library plugs into the benchmarks via a custom "shim" that provides a standard API for basic hash map operations.
 
 To add a new map, follow these steps:
 
