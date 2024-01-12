@@ -1,8 +1,12 @@
 ## Introduction
 
-This repository contains an extendible, comparative benchmark of C and C++ hash map libraries.
+This repository contains an extendible, comparative benchmark of C and C++ hash map libraries. The benchmark tests the speed of inserting keys, replacing keys, looking up existing keys, look up nonexistent keys, deleting existing keys, deleting nonexistent keys, and iteration.
 
-An example of the output can be found [here].
+The following is an example of one outputted graph:
+
+!!!
+
+Complete examples can be found !!![here].
 
 ## Installing
 
