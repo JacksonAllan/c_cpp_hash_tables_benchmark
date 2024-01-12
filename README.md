@@ -176,6 +176,16 @@ To add a new blueprint, follow these steps:
     {
       // Returns true if the two specified keys are equal.
     }
+    
+    void fill_unique_keys( std::vector< blueprint::key_type > &keys )
+    {
+      // Fills the specified vector with a set of unique keys.
+      // The size vector is already initialized with the size KEY_COUNT + KEY_COUNT /
+      // KEY_COUNT_MEASUREMENT_INTERVAL * 1000.
+      // The order is unimportant because the keys will be shuffled.
+      // This function is called exactly once.
+    }
+    
     ```
 
     `blueprint.h` should also declare a suitably named macro (e.g. `NEW_SHIM_ENABLED`) that allows each shim to use the preprocessor to optionally exclude a specialization for the blueprint.
