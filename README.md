@@ -8,11 +8,7 @@ The following is an example of one outputted graph:
 
 <picture><img src="example_graph.svg" alt="Example graph"></picture>
 
-More results can be seen below:
-
-* [20 000 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-15T13_50_24_20000000.html).
-* [2 000 000 key](https://verstablebenchmarks.netlify.app/result_2024-01-15T20_00_27_2000000.html).
-* [200 000 key](https://verstablebenchmarks.netlify.app/result_2024-01-15T20_44_58_200000.html).
+More results can be seen here: [20 000 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-15T13_50_24_20000000.html), [2 000 000 key](https://verstablebenchmarks.netlify.app/result_2024-01-15T20_00_27_2000000.html), [200 000 key](https://verstablebenchmarks.netlify.app/result_2024-01-15T20_44_58_200000.html).
 
 ## Installing
 
