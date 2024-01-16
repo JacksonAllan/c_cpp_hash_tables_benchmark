@@ -6,7 +6,7 @@ The benchmarks test the speed of inserting keys, replacing keys, looking up exis
 
 The following is an example of one outputted graph:
 
-<img src="example_graph.svg>
+<img src="example_graph.svg></img>
 
 More results can be found !!![here].
 
