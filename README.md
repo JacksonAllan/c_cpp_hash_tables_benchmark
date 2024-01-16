@@ -8,7 +8,7 @@ The following is an example of one outputted graph:
 
 <picture><img src="example_graph.svg" alt="Example graph"></picture>
 
-More results can be seen here: [20 000 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-15T13_50_24_20000000.html), [2 000 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-15T20_00_27_2000000.html), and [200 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-15T20_44_58_200000.html).
+Complete results can be found here: [20 000 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-15T13_50_24_20000000.html), [2 000 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-15T20_00_27_2000000.html), and [200 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-15T20_44_58_200000.html).
 
 ## Installing
 
