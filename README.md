@@ -8,7 +8,7 @@ The following is an example of one outputted graph:
 
 !!!
 
-Complete examples can be found !!![here].
+More results can be found !!![here].
 
 ## Installing
 
@@ -22,7 +22,7 @@ Using GCC, compile with `g++ -I. -std=c++20 -O3 -Wall -Wpedantic main.cpp` from 
 
 ## Running
 
-Close background processes, lock your CPU's frequency, and then run the executable. Under the out-of-the-box configuration, the benchmarks take approximately !!!! to complete on my AMD Ryzen 7 5800H with the CPU frequency locked at 90%.
+Close background processes, lock your CPU's frequency, and then run the executable. Under the out-of-the-box configuration, the benchmarks take approximately 45 minutes to complete on my AMD Ryzen 7 5800H with the CPU frequency locked at 90%.
 
 The resulting graphs are outputted to the `results` directory as a HMTL file named with a GMT timestamp.
 
