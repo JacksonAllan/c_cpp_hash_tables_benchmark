@@ -194,4 +194,4 @@ To add a new blueprint, follow these steps:
 
 ## Sharing results
 
-The graphs embedded in the outputted HTML file are self-contained SVGs, so they can be trivially extracted and turned into standalone SVG files or embedded into other HTML files. They can even be used in GitHub READMEs (via `<img src="./graph.svg">`), albeit without the interactive features.
+The graphs embedded in the outputted HTML file are self-contained SVGs, so they can be trivially extracted and turned into standalone SVG files or embedded into other HTML files. They can even be used in GitHub READMEs (via `<img src="graph.svg">`), albeit without the interactive features.
