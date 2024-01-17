@@ -12,7 +12,7 @@ Complete results can be found here: [20 000 000 keys](https://verstablebenchmark
 
 ## Installing
 
-1. Download and extract the repository.
+1. Download or clone the repository.
 
 2. Install [Boost](https://www.boost.org/) if necessary, or disable the `boost_unordered_flat_map` shim by editing `config.h`.
 
