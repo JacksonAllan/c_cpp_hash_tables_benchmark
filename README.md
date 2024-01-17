@@ -18,7 +18,7 @@ Complete results can be found here: [20 000 000 keys](https://verstablebenchmark
 
 ## Compiling
 
-Using GCC, compile with `g++ -I. -std=c++20 -O3 -Wall -Wpedantic main.cpp` from the master directory.
+Using GCC, compile with `g++ -I. -std=c++20 -static -O3 -Wall -Wpedantic main.cpp -o build/out` from the master directory.
 
 ## Running
 
