@@ -16,7 +16,7 @@ Complete results can be found here: [20 000 000 keys](https://verstablebenchmark
 
 2. Install [Boost](https://www.boost.org/) if necessary, or disable the `boost_unordered_flat_map` shim by editing `config.h`.
 
-## Compiling
+## Building
 
 Using GCC, compile with `g++ -I. -std=c++20 -static -O3 -Wall -Wpedantic main.cpp -o build/out` from the master directory.
 
