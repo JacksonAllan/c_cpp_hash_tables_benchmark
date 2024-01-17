@@ -2667,7 +2667,9 @@ int main()
   std::replace( time_str.begin(), time_str.end(), ':', '_' );
 
   // Use time as filename.
-  std::ofstream file( "results/result_" + time_str + ".html" );
+  // std::ofstream file( "results/result_" + time_str + ".html" );
+  std::ofstream file( "result_" + time_str + ".html" ); // EMERGENCY FIX FOR RESULTS NOT OUTPUTING DUE TO FILEPATH ISSUE.
+
 
   file << "<!doctype html>\n"
        << "<html>\n"
