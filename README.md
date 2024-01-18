@@ -8,7 +8,7 @@ The following is an example of one outputted graph:
 
 <picture><img src="example_graph.svg" alt="Example graph"></picture>
 
-Complete results can be found here: [20 000 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-15T13_50_24_20000000.html), [2 000 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-15T20_00_27_2000000.html), and [200 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-15T20_44_58_200000.html).
+Complete results can be found here: [20 000 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-17T21_16_42_20000000), [2 000 000 keys](https://verstablebenchmarks.netlify.app/https://verstablebenchmarks.netlify.app/result_2024-01-17t23_51_00_2000000), and [200 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-18T00_09_43_200000).
 
 ## Installing
 
@@ -18,13 +18,13 @@ Complete results can be found here: [20 000 000 keys](https://verstablebenchmark
 
 ## Building
 
-Using GCC, compile with `g++ -I. -std=c++20 -static -O3 -Wall -Wpedantic main.cpp -o build/out` from the master directory.
+Using GCC, compile with `g++ -I. -std=c++20 -static -O3 -DNDEBUG -Wall -Wpedantic main.cpp -o build/out` from the master directory.
 
 ## Running
 
 Close background processes, lock your CPU's frequency, and then run the executable. Under the out-of-the-box configuration, the benchmarks take approximately 45 minutes to complete on my AMD Ryzen 7 5800H with the CPU frequency locked at 90%.
 
-The resulting graphs are outputted to the `results` directory as a HMTL file named with a GMT timestamp.
+The resulting graphs are outputted to the ~`results` directory~ current working directory as a HMTL file named with a GMT timestamp.
 
 The graphs are interactive. Hover over a label to highlight the associated plot, and click the label to toggle the plot's visibility. The graphs automatically scale to the visible plots.
 
