@@ -79,6 +79,6 @@ template< typename blueprint > struct ska_bytell_hash_map
 
 template<> struct ska_bytell_hash_map< void >
 {
-  static constexpr const char *label = "ska::bytell_hash_map";
+  static constexpr const char *label = "ska";
   static constexpr const char *color = "rgb( 62, 153, 122 )";
 };

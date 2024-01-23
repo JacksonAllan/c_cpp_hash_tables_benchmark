@@ -83,6 +83,6 @@ template< typename blueprint > struct robin_hood_unordered_map
 
 template<> struct robin_hood_unordered_map< void >
 {
-  static constexpr const char *label = "robin_hood::unordered_map";
+  static constexpr const char *label = "robin_hood";
   static constexpr const char *color = "rgb( 235, 101, 108 )";
 };

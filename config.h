@@ -69,8 +69,8 @@
 #define SHIM_6 ska_bytell_hash_map
 #define SHIM_7 khash
 #define SHIM_8 verstable
-// #define SHIM_9 stc_hmap
-// #define SHIM_10
+#define SHIM_9 stc_hmap
+#define SHIM_10 cc_lib_map
 // #define SHIM_11
 // #define SHIM_12
 // #define SHIM_13

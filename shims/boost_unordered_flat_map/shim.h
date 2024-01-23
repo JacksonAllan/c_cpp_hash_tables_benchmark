@@ -86,6 +86,6 @@ template< typename blueprint > struct boost_unordered_flat_map
 
 template<> struct boost_unordered_flat_map< void >
 {
-  static constexpr const char *label = "boost::unordered_flat_map";
+  static constexpr const char *label = "boost";
   static constexpr const char *color = "rgb( 104, 110, 230 )";
 };

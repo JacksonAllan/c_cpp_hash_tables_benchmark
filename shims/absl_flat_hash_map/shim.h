@@ -95,6 +95,6 @@ template< typename blueprint > struct absl_flat_hash_map
 
 template<> struct absl_flat_hash_map< void >
 {
-  static constexpr const char *label = "absl::flat_hash_map";
+  static constexpr const char *label = "absl";
   static constexpr const char *color = "rgb( 81, 169, 240 )";
 };

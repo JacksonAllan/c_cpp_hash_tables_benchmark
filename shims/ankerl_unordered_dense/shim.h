@@ -86,6 +86,6 @@ template< typename blueprint > struct ankerl_unordered_dense
 
 template<> struct ankerl_unordered_dense< void >
 {
-  static constexpr const char *label = "ankerl::unordered_dense";
+  static constexpr const char *label = "ankerl";
   static constexpr const char *color = "rgb( 241, 199, 78 )";
 };

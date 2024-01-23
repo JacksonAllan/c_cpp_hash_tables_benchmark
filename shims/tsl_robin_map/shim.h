@@ -79,6 +79,6 @@ template< typename blueprint > struct tsl_robin_map
 
 template<> struct tsl_robin_map< void >
 {
-  static constexpr const char *label = "tsl::robin_hood";
+  static constexpr const char *label = "tsl";
   static constexpr const char *color = "rgb( 255, 141, 107 )";
 };

@@ -4,7 +4,7 @@
 
 template< typename > struct stc_hmap
 {
-  static constexpr const char *label = "STC hmap";
+  static constexpr const char *label = "STC";
   static constexpr const char *color = "rgb( 13, 127, 161 )";
 };
 
