@@ -28,7 +28,7 @@ table tr:nth-child(3)
   text-align: center;
 }
 </style>
-DRAFT DRAFT DRAFT
+<mark>DRAFT DRAFT DRAFT</mark>
 
 # An Extensive Benchmark of C (and Some C++) Hash Tables
 
