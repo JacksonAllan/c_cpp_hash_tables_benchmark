@@ -3,14 +3,14 @@
 // Distributed under the MIT License (see the accompanying LICENSE file).
 
 // The total number of unique keys to include in the benchmarks.
-#define KEY_COUNT 20000000
+#define KEY_COUNT 200000
 
 // The frequency at which to measure and record times.
 // This must be a factor of KEY_COUNT.
-#define KEY_COUNT_MEASUREMENT_INTERVAL 50000
+#define KEY_COUNT_MEASUREMENT_INTERVAL 500
 
 // The number of times to repeat the benchmarks.
-#define RUN_COUNT 12
+#define RUN_COUNT 14
 
 // Each data point in the outputted graphs is the average of the measurements for that point across all runs, excluding
 // the lowest and highest measurements.
@@ -18,7 +18,7 @@
 // highest measurement will be discarded).
 // It should be an even number below RUN_COUNT.
 // This mechanism reduces the impact of background noise interfering with the benchmarks.
-#define DISCARDED_RUNS_COUNT 2
+#define DISCARDED_RUNS_COUNT 4
 
 // The maximum load factor that all shims should, in theory, apply when initializing their maps.
 // In reality, some hash map libraries do not allow custom load factors.
@@ -61,19 +61,36 @@
 // #define BLUEPRINT_16
 
 // Shim slots.
-#define SHIM_1 absl_flat_hash_map
-#define SHIM_2 boost_unordered_flat_map
-#define SHIM_3 ankerl_unordered_dense
-#define SHIM_4 robin_hood_unordered_map
-#define SHIM_5 tsl_robin_map
-#define SHIM_6 ska_bytell_hash_map
-#define SHIM_7 khash
+/*#define SHIM_1 std_unordered_map
+#define SHIM_2 uthash
+#define SHIM_3 absl_flat_hash_map
+#define SHIM_4 boost_unordered_flat_map
+#define SHIM_5 ankerl_unordered_dense
+#define SHIM_6 tsl_robin_map
+#define SHIM_7 ska_bytell_hash_map
 #define SHIM_8 verstable
-#define SHIM_9 stc_hmap
-#define SHIM_10 cc_lib_map
-// #define SHIM_11
-// #define SHIM_12
-// #define SHIM_13
+#define SHIM_9 cc_lib_map
+#define SHIM_10 khash
+#define SHIM_11 stb_ds_hm_sh // stb_ds does not automatically respect MAX_LOAD_FACTOR (stb_ds.h must be modified).
+#define SHIM_12 mlib_dict_oa_def2
+#define SHIM_13 stc_hmap
+// #define SHIM_14
+// #define SHIM_15
+// #define SHIM_16*/
+
+#define SHIM_1 ankerl_unordered_dense
+#define SHIM_2 absl_flat_hash_map
+#define SHIM_3 boost_unordered_flat_map
+#define SHIM_4 ska_bytell_hash_map
+#define SHIM_5 std_unordered_map
+#define SHIM_6 tsl_robin_map
+#define SHIM_7 cc_lib_map
+#define SHIM_8 stc_hmap
+#define SHIM_9 khash
+#define SHIM_10 mlib_dict_oa_def2
+#define SHIM_11 stb_ds_hm_sh // stb_ds does not automatically respect MAX_LOAD_FACTOR (stb_ds.h must be modified).
+#define SHIM_12 uthash
+#define SHIM_13 verstable
 // #define SHIM_14
 // #define SHIM_15
 // #define SHIM_16

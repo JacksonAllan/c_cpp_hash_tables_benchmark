@@ -33,7 +33,7 @@
 #include "absl/base/internal/exception_testing.h"
 #include "absl/base/macros.h"
 #include "absl/base/options.h"
-#include "absl/container/internal/counting_allocator.h"
+#include "absl/container/internal/test_allocator.h"
 #include "absl/container/internal/test_instance_tracker.h"
 #include "absl/hash/hash_testing.h"
 #include "absl/log/check.h"
@@ -1619,6 +1619,30 @@ INSTANTIATE_TYPED_TEST_SUITE_P(InstanceTestOnTypes, InstanceTest,
 TEST(DynamicVec, DynamicVecCompiles) {
   DynamicVec v;
   (void)v;
+}
+
+TEST(DynamicVec, CreateNonEmptyDynamicVec) {
+  DynamicVec v(1);
+  EXPECT_EQ(v.size(), 1u);
+}
+
+TEST(DynamicVec, EmplaceBack) {
+  DynamicVec v;
+  v.emplace_back(Dynamic{});
+  EXPECT_EQ(v.size(), 1u);
+}
+
+TEST(DynamicVec, EmplaceBackAfterHeapAllocation) {
+  DynamicVec v;
+  v.reserve(10);
+  v.emplace_back(Dynamic{});
+  EXPECT_EQ(v.size(), 1u);
+}
+
+TEST(DynamicVec, EmptyIteratorComparison) {
+  DynamicVec v;
+  EXPECT_EQ(v.begin(), v.end());
+  EXPECT_EQ(v.cbegin(), v.cend());
 }
 
 TEST(AllocatorSupportTest, Constructors) {

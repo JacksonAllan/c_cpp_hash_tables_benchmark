@@ -9,9 +9,71 @@
 
 template< typename > struct khash
 {
-  static constexpr const char *label = "khash";
+  static constexpr const char *label = "klib";
   static constexpr const char *color = "rgb( 145, 99, 127 )";
 };
+
+#define KHASH_SPECIALIZATION( blueprint )                                                             \
+                                                                                                      \
+template<> struct khash< blueprint >                                                                  \
+{                                                                                                     \
+  static khash_t( blueprint ) *create_map()                                                           \
+  {                                                                                                   \
+    return kh_init( blueprint );                                                                      \
+  }                                                                                                   \
+                                                                                                      \
+  static khiter_t find( khash_t( blueprint ) *&map, const blueprint::key_type &key )                  \
+  {                                                                                                   \
+    return kh_get( blueprint, map, key );                                                             \
+  }                                                                                                   \
+                                                                                                      \
+  static void insert( khash_t( blueprint ) *&map, const blueprint::key_type &key )                    \
+  {                                                                                                   \
+    int ret;                                                                                          \
+    khiter_t itr = kh_put( blueprint, map, key, &ret );                                               \
+    kh_value( map, itr ) = blueprint::value_type();                                                   \
+  }                                                                                                   \
+                                                                                                      \
+  static void erase( khash_t( blueprint ) *&map, const blueprint::key_type &key )                     \
+  {                                                                                                   \
+    khiter_t itr = kh_get( blueprint, map, key );                                                     \
+    if( itr != kh_end( map ) )                                                                        \
+      kh_del( blueprint, map, itr );                                                                  \
+  }                                                                                                   \
+                                                                                                      \
+  static khiter_t begin_itr( khash_t( blueprint ) *&map )                                             \
+  {                                                                                                   \
+    return kh_begin( map );                                                                           \
+  }                                                                                                   \
+                                                                                                      \
+  static bool is_itr_valid( khash_t( blueprint ) *&map, khiter_t &itr )                               \
+  {                                                                                                   \
+    return itr != kh_end( map );                                                                      \
+  }                                                                                                   \
+                                                                                                      \
+  static void increment_itr( khash_t( blueprint ) *&map, khiter_t &itr )                              \
+  {                                                                                                   \
+    do                                                                                                \
+    {                                                                                                 \
+      ++itr;                                                                                          \
+    } while( itr != kh_end( map ) && !kh_exist( map, itr ) );                                         \
+  }                                                                                                   \
+                                                                                                      \
+  static const blueprint::key_type &get_key_from_itr( khash_t( blueprint ) *&map, khiter_t &itr )     \
+  {                                                                                                   \
+    return kh_key( map, itr );                                                                        \
+  }                                                                                                   \
+                                                                                                      \
+  static const blueprint::value_type &get_value_from_itr( khash_t( blueprint ) *&map, khiter_t &itr ) \
+  {                                                                                                   \
+    return kh_val( map, itr );                                                                        \
+  }                                                                                                   \
+                                                                                                      \
+  static void destroy_map( khash_t( blueprint ) *&map )                                               \
+  {                                                                                                   \
+    kh_destroy( blueprint, map );                                                                     \
+  }                                                                                                   \
+};                                                                                                    \
 
 #ifdef UINT32_UINT32_MURMUR_ENABLED
 
@@ -23,7 +85,9 @@ KHASH_INIT(
   uint32_uint32_murmur::cmpr_keys
 )
 
-template<> struct khash< uint32_uint32_murmur >
+KHASH_SPECIALIZATION( uint32_uint32_murmur )
+
+/*template<> struct khash< uint32_uint32_murmur >
 {
   static khash_t( uint32_uint32_murmur ) *create_map()
   {
@@ -84,7 +148,7 @@ template<> struct khash< uint32_uint32_murmur >
   {
     kh_destroy( uint32_uint32_murmur, map );
   }
-};
+};*/
 
 #endif
 
@@ -98,7 +162,9 @@ KHASH_INIT(
   uint64_struct448_murmur::cmpr_keys
 )
 
-template<> struct khash< uint64_struct448_murmur >
+KHASH_SPECIALIZATION( uint64_struct448_murmur )
+
+/*template<> struct khash< uint64_struct448_murmur >
 {
   static khash_t( uint64_struct448_murmur ) *create_map()
   {
@@ -162,7 +228,7 @@ template<> struct khash< uint64_struct448_murmur >
   {
     kh_destroy( uint64_struct448_murmur, map );
   }
-};
+};*/
 
 #endif
 
@@ -176,7 +242,9 @@ KHASH_INIT(
   cstring_uint64_fnv1a::cmpr_keys
 )
 
-template<> struct khash< cstring_uint64_fnv1a >
+KHASH_SPECIALIZATION( cstring_uint64_fnv1a )
+
+/*template<> struct khash< cstring_uint64_fnv1a >
 {
   static khash_t( cstring_uint64_fnv1a ) *create_map()
   {
@@ -237,6 +305,6 @@ template<> struct khash< cstring_uint64_fnv1a >
   {
     kh_destroy( cstring_uint64_fnv1a, map );
   }
-};
+};*/
 
 #endif

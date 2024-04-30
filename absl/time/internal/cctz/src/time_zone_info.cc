@@ -338,11 +338,13 @@ bool TimeZoneInfo::ExtendTransitions() {
     return EquivTransitions(transitions_.back().type_index, dst_ti);
   }
 
-  // Extend the transitions for an additional 400 years using the
-  // future specification. Years beyond those can be handled by
-  // mapping back to a cycle-equivalent year within that range.
-  // We may need two additional transitions for the current year.
-  transitions_.reserve(transitions_.size() + 400 * 2 + 2);
+  // Extend the transitions for an additional 401 years using the future
+  // specification. Years beyond those can be handled by mapping back to
+  // a cycle-equivalent year within that range. Note that we need 401
+  // (well, at least the first transition in the 401st year) so that the
+  // end of the 400th year is mapped back to an extended year. And first
+  // we may also need two additional transitions for the current year.
+  transitions_.reserve(transitions_.size() + 2 + 401 * 2);
   extended_ = true;
 
   const Transition& last(transitions_.back());
@@ -356,7 +358,7 @@ bool TimeZoneInfo::ExtendTransitions() {
 
   Transition dst = {0, dst_ti, civil_second(), civil_second()};
   Transition std = {0, std_ti, civil_second(), civil_second()};
-  for (const year_t limit = last_year_ + 400;; ++last_year_) {
+  for (const year_t limit = last_year_ + 401;; ++last_year_) {
     auto dst_trans_off = TransOffset(leap_year, jan1_weekday, posix.dst_start);
     auto std_trans_off = TransOffset(leap_year, jan1_weekday, posix.dst_end);
     dst.unix_time = jan1_time + dst_trans_off - posix.std_offset;
@@ -472,7 +474,8 @@ std::unique_ptr<ZoneInfoSource> AndroidZoneInfoSource::Open(
   const std::size_t pos = (name.compare(0, 5, "file:") == 0) ? 5 : 0;
 
   // See Android's libc/tzcode/bionic.cpp for additional information.
-  for (const char* tzdata : {"/data/misc/zoneinfo/current/tzdata",
+  for (const char* tzdata : {"/apex/com.android.tzdata/etc/tz/tzdata",
+                             "/data/misc/zoneinfo/current/tzdata",
                              "/system/usr/share/zoneinfo/tzdata"}) {
     auto fp = FOpen(tzdata, "rb");
     if (fp == nullptr) continue;
@@ -537,9 +540,16 @@ std::unique_ptr<ZoneInfoSource> FuchsiaZoneInfoSource::Open(
   // Prefixes where a Fuchsia component might find zoneinfo files,
   // in descending order of preference.
   const auto kTzdataPrefixes = {
+      // The tzdata from `config-data`.
       "/config/data/tzdata/",
+      // The tzdata bundled in the component's package.
       "/pkg/data/tzdata/",
+      // General data storage.
       "/data/tzdata/",
+      // The recommended path for routed-in tzdata files.
+      // See for details:
+      // https://fuchsia.dev/fuchsia-src/concepts/process/namespaces?hl=en#typical_directory_structure
+      "/config/tzdata/",
   };
   const auto kEmptyPrefix = {""};
   const bool name_absolute = (pos != name.size() && name[pos] == '/');
@@ -741,19 +751,6 @@ bool TimeZoneInfo::Load(ZoneInfoSource* zip) {
   if (version_.empty()) {
     version_ = zip->Version();
   }
-
-  // Trim redundant transitions. zic may have added these to work around
-  // differences between the glibc and reference implementations (see
-  // zic.c:dontmerge) or to avoid bugs in old readers. For us, they just
-  // get in the way when we do future_spec_ extension.
-  while (hdr.timecnt > 1) {
-    if (!EquivTransitions(transitions_[hdr.timecnt - 1].type_index,
-                          transitions_[hdr.timecnt - 2].type_index)) {
-      break;
-    }
-    hdr.timecnt -= 1;
-  }
-  transitions_.resize(hdr.timecnt);
 
   // Ensure that there is always a transition in the first half of the
   // time line (the second half is handled below) so that the signed

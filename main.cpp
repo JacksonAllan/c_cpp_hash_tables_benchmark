@@ -828,6 +828,59 @@ static_assert( check_shim_against_blueprint< SHIM_13, BLUEPRINT_16 > );
 #endif
 #endif
 
+#ifdef SHIM_14
+#include STRINGIFY( shims/SHIM_14/shim.h )
+static_assert( check_shim< SHIM_14 > );
+#ifdef BLUEPRINT_1
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_1 > );
+#endif
+#ifdef BLUEPRINT_2
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_2 > );
+#endif
+#ifdef BLUEPRINT_3
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_3 > );
+#endif
+#ifdef BLUEPRINT_4
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_4 > );
+#endif
+#ifdef BLUEPRINT_5
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_5 > );
+#endif
+#ifdef BLUEPRINT_6
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_6 > );
+#endif
+#ifdef BLUEPRINT_7
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_7 > );
+#endif
+#ifdef BLUEPRINT_8
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_8 > );
+#endif
+#ifdef BLUEPRINT_9
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_9 > );
+#endif
+#ifdef BLUEPRINT_10
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_10 > );
+#endif
+#ifdef BLUEPRINT_11
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_11 > );
+#endif
+#ifdef BLUEPRINT_12
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_12 > );
+#endif
+#ifdef BLUEPRINT_12
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_12 > );
+#endif
+#ifdef BLUEPRINT_14
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_14 > );
+#endif
+#ifdef BLUEPRINT_15
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_15 > );
+#endif
+#ifdef BLUEPRINT_16
+static_assert( check_shim_against_blueprint< SHIM_14, BLUEPRINT_16 > );
+#endif
+#endif
+
 #ifdef SHIM_15
 #include STRINGIFY( shims/SHIM_15/shim.h )
 static_assert( check_shim< SHIM_15 > );
@@ -1091,7 +1144,7 @@ template< template< typename > typename shim, typename blueprint >void benchmark
         while( true )
         {
           shim< blueprint >::insert( map, shuffled_unique_key< blueprint >( l ) );
- 
+  
           if( ++k == 1000 )
             break;
           if( ++l == i )
@@ -1404,12 +1457,27 @@ void svg_shim_plot_out( std::ofstream &file )
   file << "'/>\n";
 }
 
+// Used to output x-axis labels with thousands separators.
+std::string uint_to_string_with_separators( uint64_t value )
+{
+    std::string result = std::to_string( value );
+    int pos = result.length() - 3;
+
+    while( pos > 0 )
+    {
+        result.insert( pos, 1, ',' );
+        pos -= 3;
+    }
+
+    return result;
+}
+
 template< typename blueprint, benchmark_ids benchmark_id > void svg_out( std::ofstream &file )
 {
   // Output the general styling.
   file <<
-    "<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='1002px' height='618px'"
-      " style='background-color: white'>\n"
+    "<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='1002px'"
+       " viewBox='0 0 1002 618' style='background-color: white;'>\n"
     "  <style>\n"
     "  .outerDiv\n"
     "  {\n"
@@ -1623,7 +1691,7 @@ template< typename blueprint, benchmark_ids benchmark_id > void svg_out( std::of
   #ifdef SHIM_12
   max_results.emplace_back(
     plot_id< SHIM_12, blueprint, benchmark_id >(),
-    max_average_result< SHIM_12, blueprint, benchmark_id >()
+    max_adjusted_average_result< SHIM_12, blueprint, benchmark_id >()
   );
   #endif
   #ifdef SHIM_13
@@ -1680,12 +1748,12 @@ template< typename blueprint, benchmark_ids benchmark_id > void svg_out( std::of
     "    <div xmlns='http://www.w3.org/1999/xhtml' class='outerDiv'>\n"
     "      <div class='heading'>" << blueprint::label << ": " << std::array{
                "Total time to insert N nonexisting keys",
-               "Total time to erase 1000 existing keys with N keys in the map",
-               "Time to replace 1000 existing keys with N keys in the map",
-               "Time to erase 1000 nonexisting keys with N keys in the map",
-               "Time to lookup 1000 existing keys with N keys in the map",
-               "Time to lookup 1000 nonexisting keys with N keys in the map",
-               "Time to iterate over 5000 keys with N keys in the map"
+               "Time to erase 1,000 existing keys with N keys in the map",
+               "Time to replace 1,000 existing keys with N keys in the map",
+               "Time to erase 1,000 nonexisting keys with N keys in the map",
+               "Time to look up 1,000 existing keys with N keys in the map",
+               "Time to look up 1,000 nonexisting keys with N keys in the map",
+               "Time to iterate over 5,000 keys with N keys in the map"
              }[ benchmark_id ] << "</div>\n"
     "      <div class='verticalSpacer'></div>\n"
   ;
@@ -1744,8 +1812,8 @@ template< typename blueprint, benchmark_ids benchmark_id > void svg_out( std::of
   file <<
     "      <div xmlns='http://www.w3.org/1999/xhtml' class='verticalSpacer'></div>\n"
     "      <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='innerSVG'>\n"
-    "        <line class='axis' x1='18' x2='18' y1='0' y2='540'></line>\n"
-    "        <line class='axis' x1='18' x2='990' y1='540' y2='540'></line>\n"
+    "        <line class='axis' x1='18' x2='18' y1='0' y2='540'/>\n"
+    "        <line class='axis' x1='18' x2='990' y1='540' y2='540'/>\n"
     "        <text class='axisLabel' x='6' y='270' alignment-baseline='middle' text-anchor='middle'"
                " transform='rotate(-90,6,270)'>Linear time from zero &#10230;</text>\n"
     "        <text class='axisLabel' x='504' y='558' alignment-baseline='middle' text-anchor='middle'>N keys</text>\n"
@@ -1762,7 +1830,8 @@ template< typename blueprint, benchmark_ids benchmark_id > void svg_out( std::of
 
     file <<
       "        <text x='" << x << "' y='" << 548 << "' alignment-baseline='middle' text-anchor='middle'"
-        " style='font: 12px sans-serif;'>" << i * (uint64_t)( KEY_COUNT / 5 ) << "</text>\n"
+        " style='font: 12px sans-serif;'>" << uint_to_string_with_separators( i * (uint64_t)( KEY_COUNT / 5 ) ) <<
+        "</text>\n"
     ;
   }
 
@@ -1829,6 +1898,736 @@ template< typename blueprint, benchmark_ids benchmark_id > void svg_out( std::of
     "  </foreignObject>\n"
     "</svg>\n"
   ;
+}
+
+
+
+
+
+template< template< typename > typename shim >
+void heatmap_shim_label_out( std::ofstream &file, unsigned int col, double cell_width )
+{
+  file << "  <text x='" << 200 + ( col + 0.5 ) * cell_width << "' y='37' text-anchor='middle'>" << shim< void >::label
+       << "</text>\n"
+  ;
+}
+
+// Function for determining the maximum adjusted average result for an entire plot.
+// This is necessary to determine graph scaling based on the visible plots.
+template< template< typename> typename shim, typename blueprint, benchmark_ids benchmark_id >
+double total_adjusted_average_result()
+{
+  //
+  if( benchmark_id == insert_nonexisting )
+    return adjusted_average_result< shim, blueprint, benchmark_id >( KEY_COUNT / KEY_COUNT_MEASUREMENT_INTERVAL - 1 );
+
+  //
+  double total = 0.0;
+  for( size_t result = 0; result < KEY_COUNT / KEY_COUNT_MEASUREMENT_INTERVAL; ++result )
+    total += adjusted_average_result< shim, blueprint, benchmark_id >( result );
+
+  return total;
+}
+
+template< template< typename > typename shim, typename blueprint, benchmark_ids benchmark_id >
+void heatmap_cell_out( std::ofstream &file, unsigned int row, unsigned int col, double cell_width, double lowest_total )
+{
+  double normalized_total = total_adjusted_average_result<shim, blueprint, benchmark_id>() / lowest_total;
+
+  double x = 200 + col * cell_width;
+  double y = 44 + row * 32;
+  double hue = ( std::min( normalized_total, 5.0 ) - 1 ) / 4.0;
+
+  file << "  <rect x='" << x + 1 << "' y='" << y + 1 << "' width='" << cell_width - 2
+       <<     "' height='30' style='fill: hsl(" << 120 * ( 1.0 - hue ) << ",90%,70%);'/>\n"
+  ;
+
+  file << "  <text x='" << x + cell_width * 0.5 << "' y='" << y + 16 + 1 << "' text-anchor='middle' "
+              "style='fill: black !important;'>" << normalized_total << "</text>\n"
+  ;
+}
+
+template< typename blueprint, benchmark_ids benchmark_id >
+void heatmap_row_out( std::ofstream &file, unsigned int row, double cell_width )
+{
+  double lowest_total = std::numeric_limits<double>::max();
+
+  #ifdef SHIM_1
+  lowest_total = std::min( total_adjusted_average_result< SHIM_1, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_2
+  lowest_total = std::min( total_adjusted_average_result< SHIM_2, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_3
+  lowest_total = std::min( total_adjusted_average_result< SHIM_3, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_4
+  lowest_total = std::min( total_adjusted_average_result< SHIM_4, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_5
+  lowest_total = std::min( total_adjusted_average_result< SHIM_5, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_6
+  lowest_total = std::min( total_adjusted_average_result< SHIM_6, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_7
+  lowest_total = std::min( total_adjusted_average_result< SHIM_7, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_8
+  lowest_total = std::min( total_adjusted_average_result< SHIM_8, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_9
+  lowest_total = std::min( total_adjusted_average_result< SHIM_9, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_10
+  lowest_total = std::min( total_adjusted_average_result< SHIM_10, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_11
+  lowest_total = std::min( total_adjusted_average_result< SHIM_11, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_12
+  lowest_total = std::min( total_adjusted_average_result< SHIM_12, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_13
+  lowest_total = std::min( total_adjusted_average_result< SHIM_13, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_14
+  lowest_total = std::min( total_adjusted_average_result< SHIM_14, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_15
+  lowest_total = std::min( total_adjusted_average_result< SHIM_15, blueprint, benchmark_id >(), lowest_total );
+  #endif
+  #ifdef SHIM_16
+  lowest_total = std::min( total_adjusted_average_result< SHIM_16, blueprint, benchmark_id >(), lowest_total );
+  #endif
+
+  double center_y = 44 + ( row + 0.5 ) * 32 + 1;
+
+  file << "  <text x='7' y='" << center_y - 7 << "'>" << blueprint::label << ":</text>\n"
+          "  <text x='7' y='" << center_y + 7 << "'>" << std::array{
+            "Insert nonexisting",
+            "Erase existing",
+            "Replace existing",
+            "Erase nonexisting",
+            "Look up existing",
+            "Look up nonexisting",
+            "Iterate"
+          }[ benchmark_id ] << "</text>\n"
+  ;
+
+  int col = 0;
+
+  #ifdef SHIM_1
+  heatmap_cell_out< SHIM_1, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_2
+  heatmap_cell_out< SHIM_2, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_3
+  heatmap_cell_out< SHIM_3, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_4
+  heatmap_cell_out< SHIM_4, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_5
+  heatmap_cell_out< SHIM_5, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_6
+  heatmap_cell_out< SHIM_6, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_7
+  heatmap_cell_out< SHIM_7, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_8
+  heatmap_cell_out< SHIM_8, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_9
+  heatmap_cell_out< SHIM_9, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_10
+  heatmap_cell_out< SHIM_10, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_11
+  heatmap_cell_out< SHIM_11, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_12
+  heatmap_cell_out< SHIM_12, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_13
+  heatmap_cell_out< SHIM_13, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_14
+  heatmap_cell_out< SHIM_14, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_15
+  heatmap_cell_out< SHIM_15, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+  #ifdef SHIM_16
+  heatmap_cell_out< SHIM_16, blueprint, benchmark_id >( file, row, col++, cell_width, lowest_total );
+  #endif
+}
+
+void heatmap_out( std::ofstream &file )
+{
+  unsigned int cell_cols = 0;
+
+  #ifdef SHIM_1
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_2
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_3
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_4
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_5
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_6
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_7
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_8
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_9
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_10
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_11
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_12
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_13
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_14
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_15
+  ++cell_cols;
+  #endif
+  #ifdef SHIM_16
+  ++cell_cols;
+  #endif
+
+  double cell_width = 797 / (double)cell_cols;
+
+  unsigned int benchmarks = 0;
+
+  #ifdef BENCHMARK_INSERT_NONEXISTING
+  ++benchmarks;
+  #endif
+  #ifdef BENCHMARK_ERASE_EXISTING
+  ++benchmarks;
+  #endif
+  #ifdef BENCHMARK_INSERT_EXISTING
+  ++benchmarks;
+  #endif
+  #ifdef BENCHMARK_ERASE_NONEXISTING
+  ++benchmarks;
+  #endif
+  #ifdef BENCHMARK_GET_EXISTING
+  ++benchmarks;
+  #endif
+  #ifdef BENCHMARK_GET_NONEXISTING
+  ++benchmarks;
+  #endif
+  #ifdef BENCHMARK_ITERATION
+  ++benchmarks;
+  #endif
+
+  unsigned int cell_rows = 0;
+
+  #ifdef BLUEPRINT_1
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_2
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_3
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_4
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_5
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_6
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_7
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_8
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_9
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_10
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_11
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_12
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_13
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_14
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_15
+  cell_rows += benchmarks;
+  #endif
+  #ifdef BLUEPRINT_16
+  cell_rows += benchmarks;
+  #endif
+
+  file << "<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='1002px' "
+            "viewBox='0 0 1002 " << 44 + cell_rows * 32 + 5 << "' style='background-color: white;'>\n"
+          "  <style>\n"
+          "  text\n"
+          "  {\n"
+          "    fill: black;\n"
+          "    font: 12px sans-serif;\n"
+          "    dominant-baseline: middle;\n"
+          "  }\n"
+          "  </style>\n"
+          "  <text x='501' y='16' style='font-size: 14px;' text-anchor='middle'>Total time taken relative to the "
+               "fastest table in the benchmark (lower is better)</text>\n"
+  ;
+
+  // Output shim labels.
+
+  unsigned int col = 0;
+
+  #ifdef SHIM_1
+  heatmap_shim_label_out< SHIM_1 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_2
+  heatmap_shim_label_out< SHIM_2 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_3
+  heatmap_shim_label_out< SHIM_3 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_4
+  heatmap_shim_label_out< SHIM_4 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_5
+  heatmap_shim_label_out< SHIM_5 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_6
+  heatmap_shim_label_out< SHIM_6 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_7
+  heatmap_shim_label_out< SHIM_7 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_8
+  heatmap_shim_label_out< SHIM_8 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_9
+  heatmap_shim_label_out< SHIM_9 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_10
+  heatmap_shim_label_out< SHIM_10 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_11
+  heatmap_shim_label_out< SHIM_11 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_12
+  heatmap_shim_label_out< SHIM_12 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_13
+  heatmap_shim_label_out< SHIM_13 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_14
+  heatmap_shim_label_out< SHIM_14 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_15
+  heatmap_shim_label_out< SHIM_15 >( file, col++, cell_width );
+  #endif
+  #ifdef SHIM_16
+  heatmap_shim_label_out< SHIM_16 >( file, col++, cell_width );
+  #endif
+
+  // Output rows.
+
+  file << std::fixed << std::setprecision( 2 );
+
+  unsigned int row = 0;
+
+  #ifdef BENCHMARK_INSERT_NONEXISTING
+  #ifdef BLUEPRINT_1
+  heatmap_row_out< BLUEPRINT_1, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_2
+  heatmap_row_out< BLUEPRINT_2, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_3
+  heatmap_row_out< BLUEPRINT_3, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_4
+  heatmap_row_out< BLUEPRINT_4, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_5
+  heatmap_row_out< BLUEPRINT_5, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_6
+  heatmap_row_out< BLUEPRINT_6, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_7
+  heatmap_row_out< BLUEPRINT_7, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_8
+  heatmap_row_out< BLUEPRINT_8, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_9
+  heatmap_row_out< BLUEPRINT_9, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_10
+  heatmap_row_out< BLUEPRINT_10, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_11
+  heatmap_row_out< BLUEPRINT_11, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_12
+  heatmap_row_out< BLUEPRINT_12, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_13
+  heatmap_row_out< BLUEPRINT_13, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_14
+  heatmap_row_out< BLUEPRINT_14, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_15
+  heatmap_row_out< BLUEPRINT_15, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_16
+  heatmap_row_out< BLUEPRINT_16, insert_nonexisting >( file, row++, cell_width );
+  #endif
+  #endif
+
+  #ifdef BENCHMARK_ERASE_EXISTING
+  #ifdef BLUEPRINT_1
+  heatmap_row_out< BLUEPRINT_1, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_2
+  heatmap_row_out< BLUEPRINT_2, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_3
+  heatmap_row_out< BLUEPRINT_3, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_4
+  heatmap_row_out< BLUEPRINT_4, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_5
+  heatmap_row_out< BLUEPRINT_5, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_6
+  heatmap_row_out< BLUEPRINT_6, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_7
+  heatmap_row_out< BLUEPRINT_7, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_8
+  heatmap_row_out< BLUEPRINT_8, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_9
+  heatmap_row_out< BLUEPRINT_9, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_10
+  heatmap_row_out< BLUEPRINT_10, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_11
+  heatmap_row_out< BLUEPRINT_11, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_12
+  heatmap_row_out< BLUEPRINT_12, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_13
+  heatmap_row_out< BLUEPRINT_13, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_14
+  heatmap_row_out< BLUEPRINT_14, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_15
+  heatmap_row_out< BLUEPRINT_15, erase_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_16
+  heatmap_row_out< BLUEPRINT_16, erase_existing >( file, row++, cell_width );
+  #endif
+  #endif
+
+  #ifdef BENCHMARK_INSERT_EXISTING
+  #ifdef BLUEPRINT_1
+  heatmap_row_out< BLUEPRINT_1, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_2
+  heatmap_row_out< BLUEPRINT_2, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_3
+  heatmap_row_out< BLUEPRINT_3, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_4
+  heatmap_row_out< BLUEPRINT_4, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_5
+  heatmap_row_out< BLUEPRINT_5, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_6
+  heatmap_row_out< BLUEPRINT_6, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_7
+  heatmap_row_out< BLUEPRINT_7, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_8
+  heatmap_row_out< BLUEPRINT_8, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_9
+  heatmap_row_out< BLUEPRINT_9, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_10
+  heatmap_row_out< BLUEPRINT_10, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_11
+  heatmap_row_out< BLUEPRINT_11, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_12
+  heatmap_row_out< BLUEPRINT_12, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_13
+  heatmap_row_out< BLUEPRINT_13, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_14
+  heatmap_row_out< BLUEPRINT_14, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_15
+  heatmap_row_out< BLUEPRINT_15, insert_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_16
+  heatmap_row_out< BLUEPRINT_16, insert_existing >( file, row++, cell_width );
+  #endif
+  #endif
+
+  #ifdef BENCHMARK_ERASE_NONEXISTING
+  #ifdef BLUEPRINT_1
+  heatmap_row_out< BLUEPRINT_1, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_2
+  heatmap_row_out< BLUEPRINT_2, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_3
+  heatmap_row_out< BLUEPRINT_3, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_4
+  heatmap_row_out< BLUEPRINT_4, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_5
+  heatmap_row_out< BLUEPRINT_5, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_6
+  heatmap_row_out< BLUEPRINT_6, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_7
+  heatmap_row_out< BLUEPRINT_7, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_8
+  heatmap_row_out< BLUEPRINT_8, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_9
+  heatmap_row_out< BLUEPRINT_9, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_10
+  heatmap_row_out< BLUEPRINT_10, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_11
+  heatmap_row_out< BLUEPRINT_11, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_12
+  heatmap_row_out< BLUEPRINT_12, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_13
+  heatmap_row_out< BLUEPRINT_13, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_14
+  heatmap_row_out< BLUEPRINT_14, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_15
+  heatmap_row_out< BLUEPRINT_15, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_16
+  heatmap_row_out< BLUEPRINT_16, erase_nonexisting >( file, row++, cell_width );
+  #endif
+  #endif
+
+  #ifdef BENCHMARK_GET_EXISTING
+  #ifdef BLUEPRINT_1
+  heatmap_row_out< BLUEPRINT_1, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_2
+  heatmap_row_out< BLUEPRINT_2, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_3
+  heatmap_row_out< BLUEPRINT_3, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_4
+  heatmap_row_out< BLUEPRINT_4, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_5
+  heatmap_row_out< BLUEPRINT_5, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_6
+  heatmap_row_out< BLUEPRINT_6, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_7
+  heatmap_row_out< BLUEPRINT_7, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_8
+  heatmap_row_out< BLUEPRINT_8, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_9
+  heatmap_row_out< BLUEPRINT_9, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_10
+  heatmap_row_out< BLUEPRINT_10, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_11
+  heatmap_row_out< BLUEPRINT_11, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_12
+  heatmap_row_out< BLUEPRINT_12, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_13
+  heatmap_row_out< BLUEPRINT_13, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_14
+  heatmap_row_out< BLUEPRINT_14, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_15
+  heatmap_row_out< BLUEPRINT_15, get_existing >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_16
+  heatmap_row_out< BLUEPRINT_16, get_existing >( file, row++, cell_width );
+  #endif
+  #endif
+
+  #ifdef BENCHMARK_GET_NONEXISTING
+  #ifdef BLUEPRINT_1
+  heatmap_row_out< BLUEPRINT_1, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_2
+  heatmap_row_out< BLUEPRINT_2, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_3
+  heatmap_row_out< BLUEPRINT_3, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_4
+  heatmap_row_out< BLUEPRINT_4, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_5
+  heatmap_row_out< BLUEPRINT_5, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_6
+  heatmap_row_out< BLUEPRINT_6, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_7
+  heatmap_row_out< BLUEPRINT_7, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_8
+  heatmap_row_out< BLUEPRINT_8, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_9
+  heatmap_row_out< BLUEPRINT_9, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_10
+  heatmap_row_out< BLUEPRINT_10, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_11
+  heatmap_row_out< BLUEPRINT_11, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_12
+  heatmap_row_out< BLUEPRINT_12, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_13
+  heatmap_row_out< BLUEPRINT_13, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_14
+  heatmap_row_out< BLUEPRINT_14, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_15
+  heatmap_row_out< BLUEPRINT_15, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_16
+  heatmap_row_out< BLUEPRINT_16, get_nonexisting >( file, row++, cell_width );
+  #endif
+  #endif
+
+  #ifdef BENCHMARK_ITERATION
+  #ifdef BLUEPRINT_1
+  heatmap_row_out< BLUEPRINT_1, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_2
+  heatmap_row_out< BLUEPRINT_2, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_3
+  heatmap_row_out< BLUEPRINT_3, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_4
+  heatmap_row_out< BLUEPRINT_4, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_5
+  heatmap_row_out< BLUEPRINT_5, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_6
+  heatmap_row_out< BLUEPRINT_6, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_7
+  heatmap_row_out< BLUEPRINT_7, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_8
+  heatmap_row_out< BLUEPRINT_8, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_9
+  heatmap_row_out< BLUEPRINT_9, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_10
+  heatmap_row_out< BLUEPRINT_10, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_11
+  heatmap_row_out< BLUEPRINT_11, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_12
+  heatmap_row_out< BLUEPRINT_12, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_13
+  heatmap_row_out< BLUEPRINT_13, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_14
+  heatmap_row_out< BLUEPRINT_14, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_15
+  heatmap_row_out< BLUEPRINT_15, iteration >( file, row++, cell_width );
+  #endif
+  #ifdef BLUEPRINT_16
+  heatmap_row_out< BLUEPRINT_16, iteration >( file, row++, cell_width );
+  #endif
+  #endif
+
+  file << "</svg>\n";
 }
 
 int main()
@@ -2667,9 +3466,7 @@ int main()
   std::replace( time_str.begin(), time_str.end(), ':', '_' );
 
   // Use time as filename.
-  // std::ofstream file( "results/result_" + time_str + ".html" );
-  std::ofstream file( "result_" + time_str + ".html" ); // EMERGENCY FIX FOR RESULTS NOT OUTPUTING DUE TO FILEPATH ISSUE.
-
+  std::ofstream file( "result_" + time_str + ".html" );
 
   file << "<!doctype html>\n"
        << "<html>\n"
@@ -2689,8 +3486,8 @@ int main()
        << "MAX_LOAD_FACTOR: " << MAX_LOAD_FACTOR << "<br>\n"
        << "APPROXIMATE_CACHE_SIZE: " << APPROXIMATE_CACHE_SIZE << "<br>\n"
        << "MILLISECOND_COOLDOWN_BETWEEN_BENCHMARKS: " << MILLISECOND_COOLDOWN_BETWEEN_BENCHMARKS << '\n'
-       << "</div>"
-       << "</div>"
+       << "</div>\n"
+       << "</div>\n"
   ;
 
   #ifdef BENCHMARK_INSERT_NONEXISTING
@@ -3049,6 +3846,9 @@ int main()
   svg_out< BLUEPRINT_16, iteration >( file );
   #endif
   #endif
+
+  heatmap_out( file );
+
 
   file << "</body>\n"
        << "</html>\n";

@@ -5,8 +5,66 @@
 template< typename > struct stc_hmap
 {
   static constexpr const char *label = "STC";
-  static constexpr const char *color = "rgb( 13, 127, 161 )";
+  static constexpr const char *color = "rgb( 235, 102, 107 )";
 };
+
+#define STC_HMAP_SPECIALIZATION( blueprint )                                                                        \
+                                                                                                                    \
+template<> struct stc_hmap< blueprint >                                                                             \
+{                                                                                                                   \
+  static stc_##blueprint##_map create_map()                                                                         \
+  {                                                                                                                 \
+    return stc_##blueprint##_map_init();                                                                            \
+  }                                                                                                                 \
+                                                                                                                    \
+  static stc_##blueprint##_map_iter find( stc_##blueprint##_map &map, const blueprint::key_type &key )              \
+  {                                                                                                                 \
+    return stc_##blueprint##_map_find( &map, key );                                                                 \
+  }                                                                                                                 \
+                                                                                                                    \
+  static void insert( stc_##blueprint##_map &map, const blueprint::key_type &key )                                  \
+  {                                                                                                                 \
+    stc_##blueprint##_map_insert_or_assign( &map, key, blueprint::value_type() );                                   \
+  }                                                                                                                 \
+                                                                                                                    \
+  static void erase( stc_##blueprint##_map &map, const blueprint::key_type &key )                                   \
+  {                                                                                                                 \
+    stc_##blueprint##_map_erase( &map, key );                                                                       \
+  }                                                                                                                 \
+                                                                                                                    \
+  static stc_##blueprint##_map_iter begin_itr( stc_##blueprint##_map &map )                                         \
+  {                                                                                                                 \
+    return stc_##blueprint##_map_begin( &map );                                                                     \
+  }                                                                                                                 \
+                                                                                                                    \
+  static bool is_itr_valid( stc_##blueprint##_map &map, stc_##blueprint##_map_iter &itr )                           \
+  {                                                                                                                 \
+    return itr.ref;                                                                                                 \
+  }                                                                                                                 \
+                                                                                                                    \
+  static void increment_itr( stc_##blueprint##_map &map, stc_##blueprint##_map_iter &itr )                          \
+  {                                                                                                                 \
+    stc_##blueprint##_map_next( &itr );                                                                             \
+  }                                                                                                                 \
+                                                                                                                    \
+  static const blueprint::key_type &get_key_from_itr( stc_##blueprint##_map &map, stc_##blueprint##_map_iter &itr ) \
+  {                                                                                                                 \
+    return itr.ref->first;                                                                                          \
+  }                                                                                                                 \
+                                                                                                                    \
+  static const blueprint::value_type &get_value_from_itr(                                                           \
+    stc_##blueprint##_map &map,                                                                                     \
+    stc_##blueprint##_map_iter &itr                                                                                 \
+  )                                                                                                                 \
+  {                                                                                                                 \
+    return itr.ref->second;                                                                                         \
+  }                                                                                                                 \
+                                                                                                                    \
+  static void destroy_map( stc_##blueprint##_map &map )                                                             \
+  {                                                                                                                 \
+    stc_##blueprint##_map_drop( &map );                                                                             \
+  }                                                                                                                 \
+};                                                                                                                  \
 
 #ifdef UINT32_UINT32_MURMUR_ENABLED
 
@@ -18,67 +76,7 @@ template< typename > struct stc_hmap
 #define i_max_load_factor    MAX_LOAD_FACTOR
 #include "stc/hmap.h"
 
-template<> struct stc_hmap< uint32_uint32_murmur >
-{
-  static stc_uint32_uint32_murmur_map create_map()
-  {
-    return stc_uint32_uint32_murmur_map_init();
-  }
-
-  static stc_uint32_uint32_murmur_map_iter find(
-    stc_uint32_uint32_murmur_map &map,
-    const uint32_uint32_murmur::key_type &key
-  )
-  {
-    return stc_uint32_uint32_murmur_map_find( &map, key );
-  }
-
-  static void insert( stc_uint32_uint32_murmur_map &map, const uint32_uint32_murmur::key_type &key )
-  {
-    stc_uint32_uint32_murmur_map_insert_or_assign( &map, key, uint32_uint32_murmur::value_type() );
-  }
-
-  static void erase( stc_uint32_uint32_murmur_map &map, const uint32_uint32_murmur::key_type &key )
-  {
-    stc_uint32_uint32_murmur_map_erase( &map, key );
-  }
-
-  static stc_uint32_uint32_murmur_map_iter begin_itr( stc_uint32_uint32_murmur_map &map )
-  {
-    return stc_uint32_uint32_murmur_map_begin( &map );
-  }
-
-  static bool is_itr_valid( stc_uint32_uint32_murmur_map &map, stc_uint32_uint32_murmur_map_iter &itr )
-  {
-    return itr.ref;
-  }
-
-  static void increment_itr( stc_uint32_uint32_murmur_map &map, stc_uint32_uint32_murmur_map_iter &itr )
-  {
-    stc_uint32_uint32_murmur_map_next( &itr );
-  }
-
-  static const uint32_uint32_murmur::key_type &get_key_from_itr(
-    stc_uint32_uint32_murmur_map &map,
-    stc_uint32_uint32_murmur_map_iter &itr
-  )
-  {
-    return itr.ref->first;
-  }
-
-  static const uint32_uint32_murmur::value_type &get_value_from_itr(
-    stc_uint32_uint32_murmur_map &map,
-    stc_uint32_uint32_murmur_map_iter &itr
-  )
-  {
-    return itr.ref->second;
-  }
-
-  static void destroy_map( stc_uint32_uint32_murmur_map &map )
-  {
-    stc_uint32_uint32_murmur_map_drop( &map );
-  }
-};
+STC_HMAP_SPECIALIZATION( uint32_uint32_murmur )
 
 #endif
 
@@ -92,72 +90,11 @@ template<> struct stc_hmap< uint32_uint32_murmur >
 #define i_max_load_factor    MAX_LOAD_FACTOR
 #include "stc/hmap.h"
 
-template<> struct stc_hmap< uint64_struct448_murmur >
-{
-  static stc_uint64_struct448_murmur_map create_map()
-  {
-    return stc_uint64_struct448_murmur_map_init();
-  }
-
-  static stc_uint64_struct448_murmur_map_iter find(
-    stc_uint64_struct448_murmur_map &map,
-    const uint64_struct448_murmur::key_type &key
-  )
-  {
-    return stc_uint64_struct448_murmur_map_find( &map, key );
-  }
-
-  static void insert( stc_uint64_struct448_murmur_map &map, const uint64_struct448_murmur::key_type &key )
-  {
-    stc_uint64_struct448_murmur_map_insert_or_assign( &map, key, uint64_struct448_murmur::value_type() );
-  }
-
-  static void erase( stc_uint64_struct448_murmur_map &map, const uint64_struct448_murmur::key_type &key )
-  {
-    stc_uint64_struct448_murmur_map_erase( &map, key );
-  }
-
-  static stc_uint64_struct448_murmur_map_iter begin_itr( stc_uint64_struct448_murmur_map &map )
-  {
-    return stc_uint64_struct448_murmur_map_begin( &map );
-  }
-
-  static bool is_itr_valid( stc_uint64_struct448_murmur_map &map, stc_uint64_struct448_murmur_map_iter &itr )
-  {
-    return itr.ref;
-  }
-
-  static void increment_itr( stc_uint64_struct448_murmur_map &map, stc_uint64_struct448_murmur_map_iter &itr )
-  {
-    stc_uint64_struct448_murmur_map_next( &itr );
-  }
-
-  static const uint64_struct448_murmur::key_type &get_key_from_itr(
-    stc_uint64_struct448_murmur_map &map,
-    stc_uint64_struct448_murmur_map_iter &itr
-  )
-  {
-    return itr.ref->first;
-  }
-
-  static const uint64_struct448_murmur::value_type &get_value_from_itr(
-    stc_uint64_struct448_murmur_map &map,
-    stc_uint64_struct448_murmur_map_iter &itr
-  )
-  {
-    return itr.ref->second;
-  }
-
-  static void destroy_map( stc_uint64_struct448_murmur_map &map )
-  {
-    stc_uint64_struct448_murmur_map_drop( &map );
-  }
-};
+STC_HMAP_SPECIALIZATION( uint64_struct448_murmur )
 
 #endif
 
 #ifdef CSTRING_UINT64_FNV1A_ENABLED
-
 #define i_type               stc_cstring_uint64_fnv1a_map
 #define i_key                cstring_uint64_fnv1a::key_type
 #define i_val                cstring_uint64_fnv1a::value_type
@@ -166,66 +103,6 @@ template<> struct stc_hmap< uint64_struct448_murmur >
 #define i_max_load_factor    MAX_LOAD_FACTOR
 #include "stc/hmap.h"
 
-template<> struct stc_hmap< cstring_uint64_fnv1a >
-{
-  static stc_cstring_uint64_fnv1a_map create_map()
-  {
-    return stc_cstring_uint64_fnv1a_map_init();
-  }
-
-  static stc_cstring_uint64_fnv1a_map_iter find(
-    stc_cstring_uint64_fnv1a_map &map,
-    const cstring_uint64_fnv1a::key_type &key
-  )
-  {
-    return stc_cstring_uint64_fnv1a_map_find( &map, key );
-  }
-
-  static void insert( stc_cstring_uint64_fnv1a_map &map, const cstring_uint64_fnv1a::key_type &key )
-  {
-    stc_cstring_uint64_fnv1a_map_insert_or_assign( &map, key, cstring_uint64_fnv1a::value_type() );
-  }
-
-  static void erase( stc_cstring_uint64_fnv1a_map &map, const cstring_uint64_fnv1a::key_type &key )
-  {
-    stc_cstring_uint64_fnv1a_map_erase( &map, key );
-  }
-
-  static stc_cstring_uint64_fnv1a_map_iter begin_itr( stc_cstring_uint64_fnv1a_map &map )
-  {
-    return stc_cstring_uint64_fnv1a_map_begin( &map );
-  }
-
-  static bool is_itr_valid( stc_cstring_uint64_fnv1a_map &map, stc_cstring_uint64_fnv1a_map_iter &itr )
-  {
-    return itr.ref;
-  }
-
-  static void increment_itr( stc_cstring_uint64_fnv1a_map &map, stc_cstring_uint64_fnv1a_map_iter &itr )
-  {
-    stc_cstring_uint64_fnv1a_map_next( &itr );
-  }
-
-  static const cstring_uint64_fnv1a::key_type &get_key_from_itr(
-    stc_cstring_uint64_fnv1a_map &map,
-    stc_cstring_uint64_fnv1a_map_iter &itr
-  )
-  {
-    return itr.ref->first;
-  }
-
-  static const cstring_uint64_fnv1a::value_type &get_value_from_itr(
-    stc_cstring_uint64_fnv1a_map &map,
-    stc_cstring_uint64_fnv1a_map_iter &itr
-  )
-  {
-    return itr.ref->second;
-  }
-
-  static void destroy_map( stc_cstring_uint64_fnv1a_map &map )
-  {
-    stc_cstring_uint64_fnv1a_map_drop( &map );
-  }
-};
+STC_HMAP_SPECIALIZATION( cstring_uint64_fnv1a )
 
 #endif
