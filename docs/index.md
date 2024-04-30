@@ -12040,7 +12040,7 @@ I have consolidated the above results into a heat map that makes is easier to co
   <text x='966.35' y='700.00' text-anchor='middle' style='fill: black !important;'>3.12</text>
 </svg>
 
-Since the horizontal scale of the above graphs is linear, not exponential, I repeated the benchmarks for [0 to 2,000,000 keys](result_2024-04-29T22_04_51_2_000_000.html) and [0 to 200,000 keys](result_2024-04-29T23_56_50_200_000.html). In general, the graphs for smaller key counts show performance when the tables are hotter in the cache.
+Since the horizontal scale of the graphs is linear, not exponential, I repeated the benchmarks for [0 to 2,000,000 keys](result_2024-04-29T22_04_51_2_000_000.html) and [0 to 200,000 keys](result_2024-04-29T23_56_50_200_000.html). In general, the graphs for smaller key counts show performance when the tables are hotter in the cache.
 
 ## Analysis
 
