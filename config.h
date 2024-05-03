@@ -92,5 +92,7 @@
 #define SHIM_12 uthash
 #define SHIM_13 verstable
 // #define SHIM_14
+#define SHIM_14 emilib2O
+#define SHIM_15 emhash
 // #define SHIM_15
 // #define SHIM_16
