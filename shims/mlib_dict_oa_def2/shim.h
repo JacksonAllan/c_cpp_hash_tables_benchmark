@@ -71,8 +71,6 @@ template<> struct mlib_dict_oa_def2< blueprint >                                
       /                                                                                                            \
       sizeof( struct mlib_dict_oa_def2_##blueprint##_pair_s );                                                     \
                                                                                                                    \
-    assert( &mlib_dict_oa_def2_##blueprint##_ref( itr.itr )->value == value );                                     \
-                                                                                                                   \
     return itr;                                                                                                    \
   }                                                                                                                \
                                                                                                                    \

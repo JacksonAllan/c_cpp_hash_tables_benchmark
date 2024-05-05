@@ -3,11 +3,11 @@
 // Distributed under the MIT License (see the accompanying LICENSE file).
 
 // The total number of unique keys to include in the benchmarks.
-#define KEY_COUNT 200000
+#define KEY_COUNT 20000000
 
 // The frequency at which to measure and record times.
 // This must be a factor of KEY_COUNT.
-#define KEY_COUNT_MEASUREMENT_INTERVAL 500
+#define KEY_COUNT_MEASUREMENT_INTERVAL 50000
 
 // The number of times to repeat the benchmarks.
 #define RUN_COUNT 14
@@ -61,23 +61,6 @@
 // #define BLUEPRINT_16
 
 // Shim slots.
-/*#define SHIM_1 std_unordered_map
-#define SHIM_2 uthash
-#define SHIM_3 absl_flat_hash_map
-#define SHIM_4 boost_unordered_flat_map
-#define SHIM_5 ankerl_unordered_dense
-#define SHIM_6 tsl_robin_map
-#define SHIM_7 ska_bytell_hash_map
-#define SHIM_8 verstable
-#define SHIM_9 cc_lib_map
-#define SHIM_10 khash
-#define SHIM_11 stb_ds_hm_sh // stb_ds does not automatically respect MAX_LOAD_FACTOR (stb_ds.h must be modified).
-#define SHIM_12 mlib_dict_oa_def2
-#define SHIM_13 stc_hmap
-// #define SHIM_14
-// #define SHIM_15
-// #define SHIM_16*/
-
 #define SHIM_1 ankerl_unordered_dense
 #define SHIM_2 absl_flat_hash_map
 #define SHIM_3 boost_unordered_flat_map
@@ -91,6 +74,6 @@
 #define SHIM_11 stb_ds_hm_sh // stb_ds does not automatically respect MAX_LOAD_FACTOR (stb_ds.h must be modified).
 #define SHIM_12 uthash
 #define SHIM_13 verstable
-// #define SHIM_14
+#define SHIM_14 mlib_dict_def2
 // #define SHIM_15
 // #define SHIM_16
