@@ -1,4 +1,4 @@
-// hash_map_benchmarks/shims/stb_ds_hm_sh/shim.h
+// c_cpp_hash_tables_benchmark/shims/stb_ds_hm_sh/shim.h
 // Copyright (c) 2024 Jackson L. Allan.
 // Distributed under the MIT License (see the accompanying LICENSE file).
 
@@ -41,121 +41,122 @@ template< typename > struct stb_ds_hm_sh
 {
   static constexpr const char *label = "stb_ds";
   static constexpr const char *color = "rgb( 13, 127, 161 )";
+  static constexpr bool tombstone_like_mechanism = true;
 };
 
-#define STBDS_HM_SPECIALIZATION( blueprint )                                                           \
-template<> struct stb_ds_hm_sh< blueprint >                                                            \
-{                                                                                                      \
-  using map_type = stb_ds_hm_sh_##blueprint *;                                                         \
-                                                                                                       \
-  static map_type create_map()                                                                         \
-  {                                                                                                    \
-    map_type map = NULL;                                                                               \
-    return map;                                                                                        \
-  }                                                                                                    \
-                                                                                                       \
-  static ptrdiff_t find( map_type &map, const blueprint::key_type &key )                               \
-  {                                                                                                    \
-    return stbds_hmgeti( map, key );                                                                   \
-  }                                                                                                    \
-                                                                                                       \
-  static void insert( map_type &map, const blueprint::key_type &key )                                  \
-  {                                                                                                    \
-    stbds_hmput( map, key, typename blueprint::value_type() );                                         \
-  }                                                                                                    \
-                                                                                                       \
-  static void erase( map_type &map, const blueprint::key_type &key )                                   \
-  {                                                                                                    \
-    stbds_hmdel( map, key );                                                                           \
-  }                                                                                                    \
-                                                                                                       \
-  static ptrdiff_t begin_itr( map_type &map )                                                          \
-  {                                                                                                    \
-    return 0;                                                                                          \
-  }                                                                                                    \
-                                                                                                       \
-  static bool is_itr_valid( map_type &map, ptrdiff_t &itr )                                            \
-  {                                                                                                    \
-    return itr != -1 && itr < stbds_hmlen( map );                                                      \
-  }                                                                                                    \
-                                                                                                       \
-  static void increment_itr( map_type &map, ptrdiff_t &itr )                                           \
-  {                                                                                                    \
-    ++itr;                                                                                             \
-  }                                                                                                    \
-                                                                                                       \
-  static const blueprint::key_type &get_key_from_itr( map_type &map, ptrdiff_t &itr )                  \
-  {                                                                                                    \
-    return map[ itr ].key;                                                                             \
-  }                                                                                                    \
-                                                                                                       \
-  static const blueprint::value_type &get_value_from_itr( map_type &map, ptrdiff_t &itr )              \
-  {                                                                                                    \
-    return map[ itr ].value;                                                                           \
-  }                                                                                                    \
-                                                                                                       \
-  static void destroy_map( map_type &map )                                                             \
-  {                                                                                                    \
-    stbds_hmfree( map );                                                                               \
-  }                                                                                                    \
-};                                                                                                     \
+#define STBDS_HM_SPECIALIZATION( blueprint )                                                  \
+template<> struct stb_ds_hm_sh< blueprint >                                                   \
+{                                                                                             \
+  using table_type = stb_ds_hm_sh_##blueprint *;                                              \
+                                                                                              \
+  static table_type create_table()                                                            \
+  {                                                                                           \
+    table_type table = NULL;                                                                  \
+    return table;                                                                             \
+  }                                                                                           \
+                                                                                              \
+  static ptrdiff_t find( table_type &table, const blueprint::key_type &key )                  \
+  {                                                                                           \
+    return stbds_hmgeti( table, key );                                                        \
+  }                                                                                           \
+                                                                                              \
+  static void insert( table_type &table, const blueprint::key_type &key )                     \
+  {                                                                                           \
+    stbds_hmput( table, key, typename blueprint::value_type() );                              \
+  }                                                                                           \
+                                                                                              \
+  static void erase( table_type &table, const blueprint::key_type &key )                      \
+  {                                                                                           \
+    stbds_hmdel( table, key );                                                                \
+  }                                                                                           \
+                                                                                              \
+  static ptrdiff_t begin_itr( table_type &table )                                             \
+  {                                                                                           \
+    return 0;                                                                                 \
+  }                                                                                           \
+                                                                                              \
+  static bool is_itr_valid( table_type &table, ptrdiff_t &itr )                               \
+  {                                                                                           \
+    return itr != -1 && itr < stbds_hmlen( table );                                           \
+  }                                                                                           \
+                                                                                              \
+  static void increment_itr( table_type &table, ptrdiff_t &itr )                              \
+  {                                                                                           \
+    ++itr;                                                                                    \
+  }                                                                                           \
+                                                                                              \
+  static const blueprint::key_type &get_key_from_itr( table_type &table, ptrdiff_t &itr )     \
+  {                                                                                           \
+    return table[ itr ].key;                                                                  \
+  }                                                                                           \
+                                                                                              \
+  static const blueprint::value_type &get_value_from_itr( table_type &table, ptrdiff_t &itr ) \
+  {                                                                                           \
+    return table[ itr ].value;                                                                \
+  }                                                                                           \
+                                                                                              \
+  static void destroy_table( table_type &table )                                              \
+  {                                                                                           \
+    stbds_hmfree( table );                                                                    \
+  }                                                                                           \
+};                                                                                            \
 
-#define STBDS_SH_SPECIALIZATION( blueprint )                                                           \
-template<> struct stb_ds_hm_sh< blueprint >                                                            \
-{                                                                                                      \
-  using map_type = stb_ds_hm_sh_##blueprint *;                                                         \
-                                                                                                       \
-  static map_type create_map()                                                                         \
-  {                                                                                                    \
-    map_type map = NULL;                                                                               \
-    return map;                                                                                        \
-  }                                                                                                    \
-                                                                                                       \
-  static ptrdiff_t find( map_type &map, const blueprint::key_type &key )                               \
-  {                                                                                                    \
-    return stbds_shgeti( map, key );                                                                   \
-  }                                                                                                    \
-                                                                                                       \
-  static void insert( map_type &map, const blueprint::key_type &key )                                  \
-  {                                                                                                    \
-    stbds_shput( map, key, typename blueprint::value_type() );                                         \
-  }                                                                                                    \
-                                                                                                       \
-  static void erase( map_type &map, const blueprint::key_type &key )                                   \
-  {                                                                                                    \
-    stbds_shdel( map, key );                                                                           \
-  }                                                                                                    \
-                                                                                                       \
-  static ptrdiff_t begin_itr( map_type &map )                                                          \
-  {                                                                                                    \
-    return 0;                                                                                          \
-  }                                                                                                    \
-                                                                                                       \
-  static bool is_itr_valid( map_type &map, ptrdiff_t &itr )                                            \
-  {                                                                                                    \
-    return itr != -1 && itr < stbds_shlen( map );                                                      \
-  }                                                                                                    \
-                                                                                                       \
-  static void increment_itr( map_type &map, ptrdiff_t &itr )                                           \
-  {                                                                                                    \
-    ++itr;                                                                                             \
-  }                                                                                                    \
-                                                                                                       \
-  static const blueprint::key_type &get_key_from_itr( map_type &map, ptrdiff_t &itr )                  \
-  {                                                                                                    \
-    return map[ itr ].key;                                                                             \
-  }                                                                                                    \
-                                                                                                       \
-  static const blueprint::value_type &get_value_from_itr( map_type &map, ptrdiff_t &itr )              \
-  {                                                                                                    \
-    return map[ itr ].value;                                                                           \
-  }                                                                                                    \
-                                                                                                       \
-  static void destroy_map( map_type &map )                                                             \
-  {                                                                                                    \
-    stbds_shfree( map );                                                                               \
-  }                                                                                                    \
-};                                                                                                     \
+#define STBDS_SH_SPECIALIZATION( blueprint )                                                  \
+template<> struct stb_ds_hm_sh< blueprint >                                                   \
+{                                                                                             \
+  using table_type = stb_ds_hm_sh_##blueprint *;                                              \
+                                                                                              \
+  static table_type create_table()                                                            \
+  {                                                                                           \
+    table_type table = NULL;                                                                  \
+    return table;                                                                             \
+  }                                                                                           \
+                                                                                              \
+  static ptrdiff_t find( table_type &table, const blueprint::key_type &key )                  \
+  {                                                                                           \
+    return stbds_shgeti( table, key );                                                        \
+  }                                                                                           \
+                                                                                              \
+  static void insert( table_type &table, const blueprint::key_type &key )                     \
+  {                                                                                           \
+    stbds_shput( table, key, typename blueprint::value_type() );                              \
+  }                                                                                           \
+                                                                                              \
+  static void erase( table_type &table, const blueprint::key_type &key )                      \
+  {                                                                                           \
+    stbds_shdel( table, key );                                                                \
+  }                                                                                           \
+                                                                                              \
+  static ptrdiff_t begin_itr( table_type &table )                                             \
+  {                                                                                           \
+    return 0;                                                                                 \
+  }                                                                                           \
+                                                                                              \
+  static bool is_itr_valid( table_type &table, ptrdiff_t &itr )                               \
+  {                                                                                           \
+    return itr != -1 && itr < stbds_shlen( table );                                           \
+  }                                                                                           \
+                                                                                              \
+  static void increment_itr( table_type &table, ptrdiff_t &itr )                              \
+  {                                                                                           \
+    ++itr;                                                                                    \
+  }                                                                                           \
+                                                                                              \
+  static const blueprint::key_type &get_key_from_itr( table_type &table, ptrdiff_t &itr )     \
+  {                                                                                           \
+    return table[ itr ].key;                                                                  \
+  }                                                                                           \
+                                                                                              \
+  static const blueprint::value_type &get_value_from_itr( table_type &table, ptrdiff_t &itr ) \
+  {                                                                                           \
+    return table[ itr ].value;                                                                \
+  }                                                                                           \
+                                                                                              \
+  static void destroy_table( table_type &table )                                              \
+  {                                                                                           \
+    stbds_shfree( table );                                                                    \
+  }                                                                                           \
+};                                                                                            \
 
 #ifdef UINT32_UINT32_MURMUR_ENABLED
 

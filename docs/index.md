@@ -4,7 +4,7 @@
   font-weight: 500;
 }
 
-td
+.boost_absl_diagram td
 {
   background-color: white;
   vertical-align: middle !important;
@@ -17,15 +17,35 @@ td
   padding: 0.5em !important;
 }
 
-table td + td
+.boost_absl_diagram td + td
 {
   margin-left: 0 !important;
   padding-left: 0 !important;
 }
 
-table tr:nth-child(3)
+.boost_absl_diagram tr:nth-child(3)
 {
   text-align: center;
+}
+
+.uthash_diagram td
+{
+  background-color: white;
+  font-size: 0.85rem;
+  border-collapse: collapse !important;
+  border-style: hidden !important;
+  padding: 0 !important;
+}
+
+.uthash_diagram tr:nth-child(2)
+{
+  text-align: center;
+}
+
+.uthash_diagram tr:first-child td:first-child,
+.uthash_diagram tr:first-child td:last-child
+{
+  width: 50%;
 }
 </style>
 
@@ -85,25 +105,42 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
 ### C++ Tables
 
-* [<span class="table_label">ankerl::unordered_dense</span>](https://github.com/martinus/unordered_dense) v4.1.2: This table employs Robin Hood hashing, which is an open-addressing variant that moves keys around to keep their displacements from the buckets to which they hash as constant as possible. However, it makes two additions to the Robin Hood design. Firstly, rather than storing key-value pairs inside the table's buckets, it stores them contiguously in a separate array. The table buckets store indices into this array. Secondly, it stores an 8-bit fragment of each key's hash code to limit the need to compare keys directly. This table is the successor to an [earlier table from the same author](https://github.com/martinus/robin-hood-hashing), which I have excluded from the published benchmarks because it is deprecated and proved to be inferior in my earlier testing.
+* [<span class="table_label">ankerl::unordered_dense</span>](https://github.com/martinus/unordered_dense) v4.1.2: This table employs Robin Hood ordering, which is an open-addressing variant that moves keys around to keep their displacements from the buckets to which they hash as constant as possible, in conjunction with linear probing. However, it makes two additions to the Robin Hood design. Firstly, rather than storing key-value pairs inside the table's buckets, it stores them contiguously in a separate array. The table buckets store indices into this array. Secondly, it stores an 8-bit fragment of each key's hash code to limit the need to compare keys directly. This table is the successor to an [earlier table from the same author](https://github.com/martinus/robin-hood-hashing), which I have excluded from the published benchmarks because it is deprecated and proved to be inferior in my earlier testing.
+
+  Note that by default, this table can only accomodate 2<sup>32</sup> (4.29 billion) key-value pairs. Support for a high number can be enabled at the cost of additional memory usage and less cache friendliness. For these benchmarks, the default limit was used.
+
+  On x86-64, this table's approximate memory overhead is eight bytes (or 12 bytes, for tables that can accommodate more than 2<sup>32</sup> key-value pairs), plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
 * [<span class="table_label">absl::flat_hash_map</span>](https://github.com/abseil/abseil-cpp) v20240116.2: Developed by Google, this table is thoroughly documented via [the Abseil website](https://abseil.io/about/design/swisstables) and [two](https://www.youtube.com/watch?v=ncHmEUmJZf4) [presentations](https://www.youtube.com/watch?v=JZE3_0qvrMg). It is an open-addressing table that stores a 7-bit fragment of each key's hash code in a separate array and uses [SIMD](https://en.wikipedia.org/wiki/Single_instruction,_multiple_data) instructions to scan this array for potential key matches 16 buckets at a time. It relies on tombstones for erasure.
 
-* [<span class="table_label">boost::unordered_flat_map</span>](https://www.boost.org) v1.83.0: This table, too, is an open-addressing table that stores hash-code fragments in a separate array and uses SIMD instructions to scan them for potential key matches multiple buckets at a time. However, it differs from <span class="table_label">absl::flat_hash_map</span> in several important ways. Firstly, keys are hashed not to individual buckets but to 15-bucket groups, which fill up contiguously from one end to the other:
 
-  <table cellpadding="0" cellspacing="0">
+  This table's approximate memory overhead is one byte, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
+
+* [<span class="table_label">boost::unordered_flat_map</span>](https://www.boost.org/doc/libs/1_85_0/libs/unordered/doc/html/unordered.html) v1.83.0: This table, too, is an open-addressing table that stores hash-code fragments in a separate array and uses SIMD instructions to scan them for potential key matches multiple buckets at a time. However, it differs from <span class="table_label">absl::flat_hash_map</span> in several important ways. Firstly, keys are hashed not to individual buckets but to 15-bucket groups, which fill up contiguously from one end to the other:
+
+  <table class="boost_absl_diagram" cellpadding="0" cellspacing="0">
   <tr><td>boost</td><td><img src="boost_clustering.png"></td></tr>
   <tr><td>absl</td><td><img src="absl_clustering.png"></td></tr>
   <tr><td colspan="2">Clustering of key-value pairs in boost::unordered_flat_map vs absl::flat_hash_map at a load factor of 0.4375.</td></tr>
   </table>
 
-  Secondly, the hash-code fragments [consist of 7.99 bits](https://bannalia.blogspot.com/2022/11/inside-boostunorderedflatmap.html) rather than 7 bits. Thirdly, instead of tombstones, the table uses a group-level bloom filter that its authors call an "overflow byte", which also accelerates lookups of nonexisting keys (I consider this mechanism "tombstone-like" because erasures still leave a residual impact on the table's performance and cause more frequent full-table rehashing). The above details and more are documented via a [presentation](https://www.youtube.com/watch?v=Rg8MZ5pJIJA).
+  Secondly, the hash-code fragments [consist of 7.99 bits](https://bannalia.blogspot.com/2022/11/inside-boostunorderedflatmap.html) rather than 7 bits. Thirdly, instead of tombstones, the table uses a group-level bloom filter that its authors call an "overflow byte", which also accelerates lookups of nonexisting keys (below, I consider this mechanism "tombstone-like" because erasures still leave a residual impact on the table's performance and cause more frequent full-table rehashing). The above details and more are documented via a [presentation](https://www.youtube.com/watch?v=Rg8MZ5pJIJA).
 
-* [<span class="table_label">ska::bytell_hash_map</span>](https://github.com/skarupke/flat_hash_map/blob/master/bytell_hash_map.hpp): This table is the [culmination](https://probablydance.com/2018/05/28/a-new-fast-hash-table-in-response-to-googles-new-fast-hash-table) of its author's experiments with various hash table designs, including Robin Hood and SIMD-accelerated tables. It is documented most thoroughly by a [presentation](https://www.youtube.com/watch?v=M2fKMP47slQ) he delivered. The table is a hybrid of open addressing and [separate chaining](https://en.wikipedia.org/wiki/Hash_table#Separate_chaining). Keys overflowing from one bucket are stored in otherwise vacant buckets of the flat buckets array and chained together using 7-bit "jump distances" (indices into a hard-coded array of possible distances, in terms of buckets, to the next key in the chain). It shares similarities with an older technique called [coalesced hashing](https://en.wikipedia.org/wiki/Coalesced_hashing), except that the chains do not coalesce. Unfortunately, this hash-table library appears to be unmaintained.
+  This table's approximate memory overhead is 1.07 bytes, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
+
+* [<span class="table_label">ska::bytell_hash_map</span>](https://github.com/skarupke/flat_hash_map/blob/master/bytell_hash_map.hpp): This table is the [culmination](https://probablydance.com/2018/05/28/a-new-fast-hash-table-in-response-to-googles-new-fast-hash-table) of its author's experiments with various hash table designs, including Robin Hood and SIMD-accelerated tables. It is documented most thoroughly by a [presentation](https://www.youtube.com/watch?v=M2fKMP47slQ) he delivered. The table is a hybrid of open addressing and [separate chaining](https://en.wikipedia.org/wiki/Hash_table#Separate_chaining). Keys overflowing from one bucket are stored in otherwise vacant buckets and chained together using 7-bit "jump distances" (indices into a hard-coded array of possible distances, in terms of buckets, to the next key in the chain). Groups of this metadata—i.e. 7-bit jump distance coupled with 1-bit flags—are stored interspersed with groups of buckets (every 16 bytes of metadata is followed by the 16 corresponding buckets. This design shares similarities with an older technique called [coalesced hashing](https://en.wikipedia.org/wiki/Coalesced_hashing), except that the chains do not coalesce. 
+
+  This table's approximate memory overhead is one byte, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
+
+  Unfortunately, this hash-table library appears to be unmaintained.
 
 * [<span class="table_label">std::unordered_map</span>](https://en.cppreference.com/w/cpp/container/unordered_map) from GCC 12.1: This is the go-to hash table for many developers because it is part of C++'s standard library. While implementations may differ in their minor details, the constraints imposed by the C++ Standard effectively dictate that this table uses node-based separate chaining, rather than open addressing.
 
+  On a 64-bit achitecture, this table's approximate memory overhead is eight bytes per bucket and eight bytes, plus pointer-key-value padding and `malloc` header and padding, per key-value pair. However, because of the fragmentation of available memory caused by many tiny allocations, its actual memory impact may be greater.
+
 * [<span class="table_label">tsl::robin_map</span>](https://github.com/Tessil/robin-map) v1.3.0: This is another popular Robin Hood table. Unlike <span class="table_label">ankerl::unordered_dense</span>, it stores key-value pairs, displacements, and (under some conditions) hash codes together inside the buckets array. It is therefore a more conventional implementation of Robin Hood hashing.
+
+  On x86-64, this table's approximate memory overhead is 3 bytes, plus `uint16_t`-`bool`-key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
 ### C Tables
 
@@ -111,23 +148,75 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
 * <span class="table_label">hmap</span> from [<span class="table_label">STC</span>](https://github.com/stclib/STC) v5.0 beta 4: This table is an open-addressing table using linear probing. However, it stores a 7-bit fragment of each key's hash code in a separate array to limit direct key comparisons. One unusual feature of this table is that it does not rely on tombstones; rather, an erasure at a given bucket involves shifting subsequent key-value pairs whose probe sequences include that bucket backward to fill the gap. This technique is commonly used by Robin Hood tables but not conventional linear-probing tables.
 
+  This table's approximate memory overhead is one byte, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
+
 * <span class="table_label">khash</span> from [<span class="table_label">klib</span>](https://github.com/attractivechaos/klib) v0.2.8: This is a very popular open-addressing table that uses quadratic probing by default. It stores keys and values in two separate arrays (in addition to a third metadata array), rather than interspersed together in one buckets array. This choice conserves memory by eliminating padding bytes, but it means that lookups of existing keys necessarily entail extra cache misses.
 
-* <span class="table_label">DICT_OA_DEF2</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) v0.7.2: This is another open-addressing table using quadratic probing. Its standout quality is that instead of storing per-bucket metadata, it requires users to reserve two keys to mark empty buckets and tombstones. Hence, the table can often store data more densely and, therefore, in a more cache-friendly manner. For the benchmarks involving integer keys, I have opted to reserve two integer values to act as these sentinels (rather than manually pairing each key with a byte flag) in order to allow the table to take advantage of this feature. However, when configured thusly, this table cannot technically accommodate the full range of keys that the other tables can accommodate.
+  This table's approximate memory overhead is only 0.25 bytes per bucket, in addition to the size of a key and size of a value per vacant bucket.
 
-* <span class="table_label">hm</span> and <span class="table_label">sh</span> from [<span class="table_label">stb_ds</span>](https://github.com/nothings/stb/blob/master/stb_ds.h) v0.67: This is yet another open-addressing table using quadratic probing. Its remarkable feature, when it comes to performance, is that—like <span class="table_label">ankerl::unordered_dense</span>—it stores key-value pairs not directly in the hash-table buckets but contiguously in a separate array. This table is also split between one implementation for string keys and another implementation for keys of all other data types. Unfortunately, it offers little flexibility: to customize the hash functions, comparison functions, and maximum load factor, I had to modify the library header. Nevertheless, I decided to include this library in the benchmarks because of its immense popularity.
+  Note that <span class="table_label">klib</span> also includes a newer hash-table that is called <span class="table_label">khashl</span> and uses linear probing without tombstones. This table is not included in these benchmarks.
+
+* <span class="table_label">DICT</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) v????: This is another open-addressing table that uses quadratic probing by default. Like <span class="table_label">ankerl::unordered_dense</span>, it stores key-value pairs in a seperate array. The buckets array stores indices into the key-value pairs array, along with hash codes. Unlike <span class="table_label">ankerl::unordered_dense</span>, the table does not necessarily store key-value pairs contiguously because it relies on tombstones for deletion.
+
+  Like <span class="table_label">ankerl::unordered_dense</span>, this table can also only accomodate 2<sup>32</sup> key-value pairs by default, and enabling support for a high number impacts memory usage and cache efficiency. For these benchmarks, the default limit was used.
+
+  This table's approximate memory overhead is eight bytes (or 16 bytes, for tables that can accommodate more than 2<sup>32</sup> key-value pairs), plus pointer-key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
+
+* <span class="table_label">DICT_OA</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) v0.7.2????: Like DICT, DICT_OA is an open-addressing table using quadratic probing by default. However, it is more conventional in that it stores the keys and values inside the hash-table buckets. Its standout quality is that instead of storing per-bucket metadata, it requires users to reserve two keys to mark empty buckets and tombstones. Hence, the table can often store data more densely and, therefore, in a more cache-friendly manner. For the benchmarks involving integer keys, I have opted to reserve two integer values to act as these sentinels (rather than manually pairing each key with a byte flag) in order to allow the table to take advantage of this feature. However, when configured thusly, this table cannot technically accommodate the full range of keys that the other tables can accommodate.
+
+  This table's approximate memory overhead is only the key-value padding per bucket and the size of a key-value pair per vacant bucket.
+
+  Note that the \_OA suffix, as a means of distinguishing this table from <span class="table_label">M\*LIB</span>'s similarly named <span class="table_label">DICT</span>, is a misnomer that exists for API compatability with earlier versions of the library (in which <span class="table_label">DICT</span> used seperate chaining). Now, both <span class="table_label">DICT</span> and <span class="table_label">DICT_OA</span> are open-addressing tables.
+
+* <span class="table_label">hm</span> and <span class="table_label">sh</span> from [<span class="table_label">stb_ds</span>](https://github.com/nothings/stb/blob/master/stb_ds.h) v0.67: This open-addressing table appears to use linear probing in conjunction with quadratic probing at the bucket-group level. Its remarkable feature, when it comes to performance, is that—like <span class="table_label">ankerl::unordered_dense</span>—it stores key-value pairs not directly in the hash-table buckets but contiguously in a separate array. This table is also split between one implementation for string keys and another implementation for keys of all other data types. Unfortunately, it offers little flexibility: to customize the hash functions, comparison functions, and maximum load factor, I had to modify the library header. Nevertheless, I decided to include this library in the benchmarks because of its immense popularity.
+
+  On x86-64, this table's approximate memory overhead is 16 bytes, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
 * [<span class="table_label">uthash</span>](https://troydhanson.github.io/uthash) v2.3.0: This is the oldest and perhaps most popular table included in the benchmarks. Like <span class="table_label">std::unordered_map</span>, it is a node-based, separate-chaining table. Compared to the other tables, the functionality it provides is rudimentary, with users having to write much of the scaffolding themselves. It is also the only [intrusive](https://stackoverflow.com/questions/5004162/what-does-it-mean-for-a-data-structure-to-be-intrusive) hash table included in these benchmarks.
 
-* <a name="verstable_description"></a>[<span class="table_label">Verstable</span>](https://github.com/JacksonAllan/Verstable) v????: Like <span class="table_label">ska::bytell_hash_map</span>, this table is a hybrid of open addressing and separate chaining that stores keys overflowing from one bucket in otherwise vacant buckets of the flat buckets array. However, rather than chaining key-value pairs using a 7-bit index into an array of "jump distances", it does so using an 11-bit integer denoting quadratic displacement. It also stores a 4-bit fragment of each key's hash code to limit key comparisons. Hence, it uses two bytes of metadata per bucket, rather than the one byte used by <span class="table_label">ska::bytell_hash_map</span>.
+  On x86-64, this table's approximate memory overhead is 16 bytes per bucket and 56 bytes, plus malloc header and padding (assuming that the user allocates key-value pairs individually) and key-value padding, per key-value pair.
+
+<table class="uthash_diagram">
+<tr>
+<td></td>
+<td>
+{% highlight c %}
+typedef struct UT_hash_handle {
+   struct UT_hash_table *tbl;
+   void *prev;                       /* prev element in app order      */
+   void *next;                       /* next element in app order      */
+   struct UT_hash_handle *hh_prev;   /* previous hh in bucket order    */
+   struct UT_hash_handle *hh_next;   /* next hh in bucket order        */
+   const void *key;                  /* ptr to enclosing struct's key  */
+   unsigned keylen;                  /* enclosing struct's key len     */
+   unsigned hashv;                   /* result of hash-fcn(key)        */
+} UT_hash_handle;
+{% endhighlight %}
+</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="3">The 56-byte struct that uthash requires to be embedded with every key-value pair.</td>
+</tr>
+</table>
+
+* <a name="verstable_description"></a>[<span class="table_label">Verstable</span>](https://github.com/JacksonAllan/Verstable) v????: Like <span class="table_label">ska::bytell_hash_map</span>, this table is a hybrid of open addressing and separate chaining that stores keys overflowing from one bucket in otherwise vacant buckets of the flat buckets array. However, rather than chaining key-value pairs using a 7-bit index into an array of "jump distances", it does so using an 11-bit integer denoting quadratic displacement. It also stores a 4-bit fragment of each key's hash code to limit key comparisons. Hence, it uses two bytes of metadata per bucket, rather than the one byte used by <span class="table_label">ska::bytell_hash_map</span>. The metadata is stored in a separate array, rather than interspersed with groups of buckets.
+
+  This table's approximate memory overhead is two bytes, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
 ## Results
 
-Below are the resulting graphs—each corresponding to one of the aforementioned benchmarks—for [0 to 20,000,000 keys](result_2024-04-29T21_23_43_20_000_000.html).
+Since the horizontal scale of the resulting graphs (each corresponding to one of the aforementioned benchmarks) is linear, not logarithmic, I ran the benchmarks for three different key counts. Generally, the lower the total key count is, the hotter the tables are in the cache. <mark>Here are the results</mark>:
 
-As the benchmarks were repeated 14 times, each data point shown in the graphs represents the average of 10 recordings (I excluded the two highest and two lowest recordings to limit the effect of outliers and any background processing).
+* [0 to 200,000 keys](...)
+* [0 to 2,000,000 keys](...)
+* [0 to 20,000,000 keys](...)
+
+As the benchmarks were repeated 14 times for every key count, each data point shown in the graphs represents the average of 10 recordings (I excluded the two highest and two lowest recordings to limit the effect of outliers and any background processing).
 
 The graphs are interactive. Hover over a table's label to highlight the associated plot, and click it to toggle the plot's visibility. The graphs automatically scale to the visible plots.
+
+Displayed below are the results for 0 to 20,000,000 keys.
 
 <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='100%' viewBox='0 0 1002 618' style='background-color: white;'>
   <style>
@@ -11428,7 +11517,7 @@ The graphs are interactive. Hover over a table's label to highlight the associat
   </foreignObject>
 </svg>
 
-I have consolidated the above results into a heat map that makes is easier to compare tables across benchmarks. Each cell contains the total of the averaged recordings that the corresponding table registered in the corresponding benchmark (except for the insert-nonexisting benchmark, which is already cumulative), normalized to the result of the table that performed the fastest in that benchmark. A value of 2.00, for example, indicates that the table is two times slower than the best performer. The color scale spans from 1.00 (green) to 5.00 (red), so all results that are five or more times slower than the best in the benchmark are decorated solid red.
+I have also consolidated the above results into a heat map that makes is easier to compare tables across benchmarks. Each cell contains the total of the averaged recordings that the corresponding table registered in the corresponding benchmark (except for the insert-nonexisting benchmark, which is already cumulative), normalized to the result of the table that performed the fastest in that benchmark. A value of 2.00, for example, indicates that the table is two times slower than the best performer. The color scale spans from 1.00 to 10.00, so all results that are ten or more times slower than the best in the benchmark are colored black.
 
 <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='100%' viewBox='0 0 1002 721' style='background-color: white;'>
   <style>
@@ -12043,7 +12132,7 @@ I have consolidated the above results into a heat map that makes is easier to co
   <text x='966.35' y='701.00' text-anchor='middle' style='fill: black !important;'>2.86</text>
 </svg>
 
-Since the horizontal scale of the graphs is linear, not exponential, I repeated the benchmarks for [0 to 2,000,000 keys](result_2024-04-29T22_04_51_2_000_000.html) and [0 to 200,000 keys](result_2024-04-29T23_56_50_200_000.html). In general, the graphs for smaller key counts show performance when the tables are hotter in the cache.
+Since the horizontal scale of the graphs is linear, not longarithmic, I repeated the benchmarks for [0 to 2,000,000 keys](result_2024-04-29T22_04_51_2_000_000.html) and [0 to 200,000 keys](result_2024-04-29T23_56_50_200_000.html). In general, the graphs for smaller key counts show performance when the tables are hotter in the cache.
 
 ## Analysis
 
@@ -12067,9 +12156,11 @@ The following section contains my analysis of the results, especially the 0-to-2
 
 * <span class="table_label">khash</span> from <span class="table_label">klib</span>: This table has reasonably good insertion speed, particularly for integer keys. Its erasure of existing keys is fast (but relies on tombstones). However, its lookups of existing keys are relatively slow, as are its lookups and erasures of non-existing keys. Its iteration is also slow for an open-addressing table.
 
-* <span class="table_label">DICT_OA_DEF2</span> from <span class="table_label">M\*LIB</span>: This table has very fast lookups of integer keys—the fastest among the tables tested when the buckets are small. In this regard, the table is probably benefiting from the better cache performance that results from the choice to have users reserve sentinel values instead of storing metadata. However, it is relatively slow for looking up or erasing non-existing keys, and its insertion and iteration speed is average. Its erasures of integer keys are very fast but rely on tombstones.
+* <span class="table_label">DICT</span> from <span class="table_label">M\*LIB</span>: This table has extremely fast insertions and lookups of existing keys, irrespective of bucket size. However, it is rather slow for looking up nonexisting keys. Its iteration is also 2-3x slower than the slowest among the other open-addressing table, despite the storage of key-value pairs in a separate array.
 
-* <span class="table_label">hm</span> and <span class="table_label">sh</span> from <span class="table_label">stb_ds</span>: hm is slow—the slowest among the open-addressing tables—across most benchmarks. In particular, its looksups of existing and non-existing keys and erasures of non-existing keys are in the same poor-performance ballpark as the node-based tables. sh fares somewhat better, with fast insertions, replacements, and lookups of existing keys, but suffers from average performance when it comes to erasing and looking ups non-existing keys. Like <span class="table_label">ankerl::unordered_dense</span>, these tables offer near-perfect iteration speed because they store key-value pairs contiguously.
+* <span class="table_label">DICT_OA</span> from <span class="table_label">M\*LIB</span>: This table has very fast lookups of integer keys—the fastest among the tables tested when the buckets are small. In this regard, the table is probably benefiting from the better cache performance that results from the choice to have users reserve sentinel values instead of storing metadata. However, it is relatively slow for looking up or erasing non-existing keys, and its insertion and iteration speed is average. Its erasures of integer keys are very fast but rely on tombstones.
+
+* <span class="table_label">hm</span> and <span class="table_label">sh</span> from <span class="table_label">stb_ds</span>: **hm** is slow—the slowest among the open-addressing tables—across most benchmarks. In particular, its lookups of existing and non-existing keys and erasures of non-existing keys are in the same poor-performance ballpark as the node-based tables. **sh** fares somewhat better, with fast insertions, replacements, and lookups of existing keys, but suffers from average performance when it comes to erasing and looking ups non-existing keys. Like <span class="table_label">ankerl::unordered_dense</span>, these tables offer near-perfect iteration speed because they store key-value pairs contiguously.
 
 * <span class="table_label">uthash</span>: My [comments](#std_unordered_map_analysis) about the poor performance of <span class="table_label">std::unordered_map</span> also apply to <span class="table_label">uthash</span>. However, <span class="table_label">uthash</span>'s iteration is about twice as fast as <span class="table_label">std::unordered_map</span>'s iteration (albeit still extremely slow). Its author appears to be aware that its performance is no longer competitive as its [documentation](https://troydhanson.github.io/uthash/userguide.html) includes the following note:
 
@@ -12081,11 +12172,11 @@ I will finish with several general observations about hash-table designs. Firstl
 
 ## Conclusion: Which Hash Table to Choose?
 
-In C++, <span class="table_label">boost::unordered_flat_map</span> appears to be the all-around best performer and, therefore, makes an excellent default choice. However, <span class="table_label">ankerl::unordered_dense</span> offers the best iteration speed, performs reasonably well in the other benchmarks, and is a stand-alone header. Hence, it is a good choice if iteration speed is the factor most important to you or you would rather avoid adding a massive dependency to your project. <span class="table_label">ankerl::unordered_dense</span> also has faster lookups, especially when buckets are large and when the load factor is kept low.
+In C++, <span class="table_label">boost::unordered_flat_map</span> appears to be the all-around best performer and, therefore, makes an excellent default choice. However, <span class="table_label">ankerl::unordered_dense</span> offers the best iteration speed, performs reasonably well in the other benchmarks, and is a stand-alone header. Hence, it is a good choice if iteration speed is the factor most important to you or you prefer a single-header solution. <span class="table_label">ankerl::unordered_dense</span> also has faster lookups, especially when buckets are large and when the load factor is kept low.
 
-In C, the graphs show that <span class="table_label">Verstable</span> and <span class="table_label">CC</span>'s <span class="table_label">cc_map</span> are all-around excellent performers, with the former being faster for iteration. However, they are not the fastest in every scenario. If your use case is skewed towards a particular operation or pair of data types, then it is worth also considering other options, especially if you are content to use a low maximum load factor. In particular, <span class="table_label">STC</span>'s <span class="table_label">hmap</span> is faster for inserting and replacing integer keys, <span class="table_label">M\*LIB</span>'s <span class="table_label">DICT_OA_DEF2</span> has the fastest lookups of existing integer keys when the buckets are small, and <span class="table_label">stb_ds</span>'s <span class="table_label">hm</span> and <span class="table_label">sh</span> have the fastest iteration.
+In C, the graphs show that <span class="table_label">Verstable</span> and <span class="table_label">CC</span>'s <span class="table_label">cc_map</span> are all-around excellent performers, with the former being faster for iteration. However, they are not the fastest in every scenario. If your use case is skewed towards a particular operation or pair of data types, then it is worth also considering other options, especially if you are content to use a low maximum load factor. In particular, <span class="table_label">STC</span>'s <span class="table_label">hmap</span> is faster for inserting and replacing integer keys, <span class="table_label">M\*LIB</span>'s <span class="table_label">DICT_OA</span> has the fastest lookups of existing integer keys when the buckets are small, <span class="table_label">stb_ds</span>'s <span class="table_label">hm</span> and <span class="table_label">sh</span> have the fastest iteration, and <span class="table_label">klib</span>'s <span class="table_label">khash</span> has the lowest memory consumption.
 
-<span class="table_label">STC</span>'s <span class="table_label">hmap</span>, <span class="table_label">klib</span>'s <span class="table_label">khash</span>, and <span class="table_label">M\*LIB</span>'s <span class="table_label">DICT_OA_DEF2</span> are also each part of a large, comprehensive library. The usefulness of these libraries' other features to you is also a compelling reason to choose one of them.
+<span class="table_label">STC</span>'s <span class="table_label">hmap</span>, <span class="table_label">klib</span>'s <span class="table_label">khash</span>, and <span class="table_label">M\*LIB</span>'s <span class="table_label">DICT_OA</span> are also each part of a large, comprehensive library. The usefulness of these libraries' other features to you is also a compelling reason to choose one of them.
 
 <span class="table_label">uthash</span>, on the other hand, should be avoided due to all-around poor performance, unless you need the specific qualities of an intrusive or node-based table.
 
@@ -12094,6 +12185,10 @@ Finally, I must warn that some of the C tables raise portability concerns. <span
 ## Addendum: Verstable vs CC's cc_map
 
 The above conclusion may leave readers wondering about the differences between <span class="table_label">Verstable</span> and <span class="table_label">CC</span>'s <span class="table_label">cc_map</span>, which both use the same hybrid design, outside the context of performance. In short, <span class="table_label">Verstable</span> is a stand-alone hash-table library. It requires C99 or later, and it requires users to [instantiate a pseudo-template](https://github.com/JacksonAllan/Verstable/blob/main/api_reference.md#instantiating-a-hash-table-template) for every combination of key and value data types (as is common among high-performance C container libraries). It also offers full support for custom memory allocators. <span class="table_label">CC</span>, on the other hand, is a larger library that includes a range of generic containers. It uses [novel](https://github.com/JacksonAllan/CC#how-does-it-work) [techniques](https://github.com/JacksonAllan/CC/blob/main/articles/Better_C_Generics_Part_1_The_Extendible_Generic.md) to provide a simpler API and avoid the need for boilerplate from users. However, it requires C11 or later and compiler support `typeof` (which is standard as of C23), and its support for custom memory allocators is more limited.
+
+## Acknowledgements
+
+I would like to thank Joaquín M López Muñoz, Martin Leitner-Ankerl, and GitHub users attractivechaos and P-p-H-d for their valuable feedback during the drafting of this article.
 
 ## Discussion
 

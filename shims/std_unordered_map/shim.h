@@ -1,4 +1,4 @@
-// hash_map_benchmarks/shims/std_unordered_map/shim.h
+// c_cpp_hash_tables_benchmark/shims/std_unordered_map/shim.h
 // Copyright (c) 2024 Jackson L. Allan.
 // Distributed under the MIT License (see the accompanying LICENSE file).
 
@@ -22,61 +22,61 @@ template< typename blueprint > struct std_unordered_map
     }
   };
 
-  using map_type = std::unordered_map<
+  using table_type = std::unordered_map<
     typename blueprint::key_type,
     typename blueprint::value_type,
     hash,
     cmpr
   >;
 
-  static map_type create_map()
+  static table_type create_table()
   {
-    map_type map;
-    map.max_load_factor( MAX_LOAD_FACTOR );
-    return map;
+    table_type table;
+    table.max_load_factor( MAX_LOAD_FACTOR );
+    return table;
   }
 
-  static map_type::iterator find( map_type &map, const blueprint::key_type &key )
+  static table_type::iterator find( table_type &table, const blueprint::key_type &key )
   {
-    return map.find( key );
+    return table.find( key );
   }
 
-  static void insert( map_type &map, const blueprint::key_type &key )
+  static void insert( table_type &table, const blueprint::key_type &key )
   {
-    map[ key ] = typename blueprint::value_type();
+    table[ key ] = typename blueprint::value_type();
   }
 
-  static void erase( map_type &map, const blueprint::key_type &key )
+  static void erase( table_type &table, const blueprint::key_type &key )
   {
-    map.erase( key );
+    table.erase( key );
   }
 
-  static map_type::iterator begin_itr( map_type &map )
+  static table_type::iterator begin_itr( table_type &table )
   {
-    return map.begin();
+    return table.begin();
   }
 
-  static bool is_itr_valid( map_type &map, map_type::iterator &itr )
+  static bool is_itr_valid( table_type &table, table_type::iterator &itr )
   {
-    return itr != map.end();
+    return itr != table.end();
   }
 
-  static void increment_itr( map_type &map, map_type::iterator &itr )
+  static void increment_itr( table_type &table, table_type::iterator &itr )
   {
     ++itr;
   }
 
-  static const blueprint::key_type &get_key_from_itr( map_type &map, map_type::iterator &itr )
+  static const blueprint::key_type &get_key_from_itr( table_type &table, table_type::iterator &itr )
   {
     return itr->first;
   }
 
-  static const blueprint::value_type &get_value_from_itr( map_type &map, map_type::iterator &itr )
+  static const blueprint::value_type &get_value_from_itr( table_type &table, table_type::iterator &itr )
   {
     return itr->second;
   }
 
-  static void destroy_map( map_type &map )
+  static void destroy_table( table_type &table )
   {
     // RAII handles destruction.
   }
@@ -86,4 +86,5 @@ template<> struct std_unordered_map< void >
 {
   static constexpr const char *label = "std";
   static constexpr const char *color = "rgb( 185, 143, 93 )";
+  static constexpr bool tombstone_like_mechanism = false;
 };

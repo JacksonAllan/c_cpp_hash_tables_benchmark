@@ -1,4 +1,4 @@
-// hash_map_benchmarks/blueprints/uint64_struct448_murmur/blueprint.h
+// c_cpp_hash_tables_benchmark/blueprints/uint64_struct448_murmur/blueprint.h
 // Copyright (c) 2024 Jackson L. Allan.
 // Distributed under the MIT License (see the accompanying LICENSE file).
 
