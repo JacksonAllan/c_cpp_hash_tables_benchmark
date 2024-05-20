@@ -24,6 +24,11 @@ static_assert( DISCARDED_RUNS_COUNT % 2 == 0 );
 #define STRINGIFY_( x ) #x
 #define STRINGIFY( x ) STRINGIFY_( x )
 
+// Variable printed before the program closes to prevent compiler from optimizing out function calls during the
+// benchmarks.
+// This approach proved to be more reliable than local volatile variables.
+size_t do_not_optimize;
+
 // Concept to check that a blueprint is correctly formed.
 template< typename blueprint >
 concept check_blueprint =
@@ -1059,11 +1064,8 @@ void flush_cache()
 {
   static auto buffer = std::vector< uint64_t >( APPROXIMATE_CACHE_SIZE / sizeof( uint64_t ) + 1 );
 
-  volatile uint64_t do_not_optimize;
   for( auto itr = buffer.begin(); itr != buffer.end(); ++itr )
-    do_not_optimize = *itr;
-
-  (void)do_not_optimize;
+    do_not_optimize += *itr;
 }
  
 // Actual benchmarking function.
@@ -1071,20 +1073,18 @@ template< template< typename > typename shim, typename blueprint >void benchmark
 {
   std::cout << shim<void>::label << ": " << blueprint::label << "\n";
 
-  volatile unsigned char do_not_optimize = 0;
-
   // Ugly workaround to ensure that the static unique keys and results arrays inside their respective template functions
   // are initialized outside of the timed code below.
   // This is necessary because C++ has no built-in mechanism to specify that local static variables should be fully
   // initialized at program start-up.
-  do_not_optimize = *(unsigned char *)&shuffled_unique_key< blueprint >( 0 );
-  do_not_optimize = *(unsigned char *)&results< shim, blueprint, insert_nonexisting >( 0, 0 );
-  do_not_optimize = *(unsigned char *)&results< shim, blueprint, erase_existing >( 0, 0 );
-  do_not_optimize = *(unsigned char *)&results< shim, blueprint, insert_existing >( 0, 0 );
-  do_not_optimize = *(unsigned char *)&results< shim, blueprint, erase_nonexisting >( 0, 0 );
-  do_not_optimize = *(unsigned char *)&results< shim, blueprint, get_existing >( 0, 0 );
-  do_not_optimize = *(unsigned char *)&results< shim, blueprint, get_nonexisting >( 0, 0 );
-  do_not_optimize = *(unsigned char *)&results< shim, blueprint, iteration >( 0, 0 );
+  do_not_optimize += *(unsigned char *)&shuffled_unique_key< blueprint >( 0 );
+  do_not_optimize += *(unsigned char *)&results< shim, blueprint, insert_nonexisting >( 0, 0 );
+  do_not_optimize += *(unsigned char *)&results< shim, blueprint, erase_existing >( 0, 0 );
+  do_not_optimize += *(unsigned char *)&results< shim, blueprint, insert_existing >( 0, 0 );
+  do_not_optimize += *(unsigned char *)&results< shim, blueprint, erase_nonexisting >( 0, 0 );
+  do_not_optimize += *(unsigned char *)&results< shim, blueprint, get_existing >( 0, 0 );
+  do_not_optimize += *(unsigned char *)&results< shim, blueprint, get_nonexisting >( 0, 0 );
+  do_not_optimize += *(unsigned char *)&results< shim, blueprint, iteration >( 0, 0 );
 
   // Reset the cache state.
   // This ensures that each table starts each benchmarking run on equal footing, but it does not prevent the cache
@@ -1279,7 +1279,10 @@ template< template< typename > typename shim, typename blueprint >void benchmark
             // Accessing the first byte of the value prevents the above call from being optimized out and ensures that
             // tables that can preform look-ups without accessing the values (because the keys are stored separately)
             // actually incur the additional cache miss that they would incur during normal use.
-            do_not_optimize = *(unsigned char *)&shim< blueprint >::get_value_from_itr( table, itr );
+            do_not_optimize += *(unsigned char *)&shim< blueprint >::get_value_from_itr( table, itr );
+
+            if( shim< blueprint >::get_key_from_itr( table, itr ) != shuffled_unique_key< blueprint >( l ) )
+              exit( 0 );
 
             if( ++k == 1000 )
               break;
@@ -1308,8 +1311,8 @@ template< template< typename > typename shim, typename blueprint >void benchmark
           auto start = std::chrono::high_resolution_clock::now();
           while( true )
           {
-            volatile auto itr = shim< blueprint >::find( table, shuffled_unique_key< blueprint >( l ) );
-            (void)itr;
+            auto itr = shim< blueprint >::find( table, shuffled_unique_key< blueprint >( l ) );
+            do_not_optimize += shim< blueprint >::is_itr_valid( table, itr ); // Should always be false.
 
             if( ++k == 1000 )
               break;
@@ -1342,8 +1345,8 @@ template< template< typename > typename shim, typename blueprint >void benchmark
             // Accessing the first bytes of the key and value ensures that tables that iterate without directly accessing
             // the keys and/or values actually incur the additional cache misses that they would incur during normal
             // use.
-            do_not_optimize = *(unsigned char *)&shim< blueprint >::get_key_from_itr( table, itr );
-            do_not_optimize = *(unsigned char *)&shim< blueprint >::get_value_from_itr( table, itr );
+            do_not_optimize += *(unsigned char *)&shim< blueprint >::get_key_from_itr( table, itr );
+            do_not_optimize += *(unsigned char *)&shim< blueprint >::get_value_from_itr( table, itr );
 
             if( ++k == 1000 )
               break;
@@ -1367,8 +1370,6 @@ template< template< typename > typename shim, typename blueprint >void benchmark
     shim< blueprint >::destroy_table( table );
   }
   #endif
-
-  (void)do_not_optimize;
 }
 
 // Function for benchmarking a shim against all blueprints.
@@ -2813,5 +2814,6 @@ int main()
 
   csv_out( time_str );
 
+  std::cout << "Optimization preventer: " << do_not_optimize << "\n";
   std::cout << "Done\n";
 }
