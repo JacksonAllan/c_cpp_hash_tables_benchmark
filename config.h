@@ -1,16 +1,16 @@
-// hash_map_benchmarks/config.h
+// c_cpp_hash_tables_benchmark/config.h
 // Copyright (c) 2024 Jackson L. Allan.
 // Distributed under the MIT License (see the accompanying LICENSE file).
 
 // The total number of unique keys to include in the benchmarks.
-#define KEY_COUNT 20000000
+#define KEY_COUNT 200000
 
 // The frequency at which to measure and record times.
 // This must be a factor of KEY_COUNT.
-#define KEY_COUNT_MEASUREMENT_INTERVAL 50000
+#define KEY_COUNT_MEASUREMENT_INTERVAL 500
 
 // The number of times to repeat the benchmarks.
-#define RUN_COUNT 14
+#define RUN_COUNT 10
 
 // Each data point in the outputted graphs is the average of the measurements for that point across all runs, excluding
 // the lowest and highest measurements.
@@ -18,7 +18,7 @@
 // highest measurement will be discarded).
 // It should be an even number below RUN_COUNT.
 // This mechanism reduces the impact of background noise interfering with the benchmarks.
-#define DISCARDED_RUNS_COUNT 4
+#define DISCARDED_RUNS_COUNT 2
 
 // The maximum load factor that all shims should, in theory, apply when initializing their maps.
 // In reality, some hash map libraries do not allow custom load factors.
@@ -70,10 +70,10 @@
 #define SHIM_7 cc_lib_map
 #define SHIM_8 stc_hmap
 #define SHIM_9 khash
-#define SHIM_10 mlib_dict_oa_def2
-#define SHIM_11 stb_ds_hm_sh // stb_ds does not automatically respect MAX_LOAD_FACTOR (stb_ds.h must be modified).
-#define SHIM_12 uthash
-#define SHIM_13 verstable
-#define SHIM_14 mlib_dict_def2
+#define SHIM_10 mlib_dict
+#define SHIM_11 mlib_dict_oa
+#define SHIM_12 stb_ds_hm_sh // stb_ds does not automatically respect MAX_LOAD_FACTOR (stb_ds.h must be modified).
+#define SHIM_13 uthash
+#define SHIM_14 verstable
 // #define SHIM_15
 // #define SHIM_16

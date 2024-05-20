@@ -1,6 +1,6 @@
 ## Introduction
 
-This repository contains a comparative, extendible benchmarking suite for C and C++ hash map libraries.
+This repository contains a comparative, extendible benchmarking suite for C and C++ hash-table libraries.
 
 The benchmarks test the speed of inserting keys, replacing keys, looking up existing keys, look up nonexisting keys, deleting existing keys, deleting nonexisting keys, and iteration.
 
@@ -18,13 +18,13 @@ Complete results can be found here: [20 000 000 keys](https://verstablebenchmark
 
 ## Building
 
-Using GCC, compile with `g++ -I. -std=c++20 -static -O3 -DNDEBUG -Wall -Wpedantic main.cpp -o build/out` from the master directory.
+Using GCC, compile with `g++ -I. -std=c++20 -static -O3 -DNDEBUG -Wall -Wpedantic main.cpp` from the master directory.
 
 ## Running
 
-Close background processes, lock your CPU's frequency, and then run the executable. Under the out-of-the-box configuration, the benchmarks take approximately 45 minutes to complete on my AMD Ryzen 7 5800H with the CPU frequency locked at 90%.
+Close background processes, lock your CPU's frequency, and then run the executable. Under the out-of-the-box configuration, the benchmarks take approximately an hour to complete on my AMD Ryzen 7 5800H with the CPU frequency locked at 90%.
 
-The resulting graphs are outputted to the ~`results` directory~ current working directory as a HMTL file named with a GMT timestamp.
+The resulting graphs and heatmap are outputted as a HMTL file, and the raw data is outputted as a CSV file. Both these files are named with a GMT timestamp and placed in the current working directory.
 
 The graphs are interactive. Hover over a label to highlight the associated plot, and click the label to toggle the plot's visibility. The graphs automatically scale to the visible plots.
 
@@ -32,31 +32,31 @@ The graphs are interactive. Hover over a label to highlight the associated plot,
 
 Modify global settings, including the total key count, the measurement frequency, the maximum load factor, and the blueprints and shims (see below) enabled by editing `config.h`.
 
-## Built-in maps
+## Built-in tables
 
-The following hash map libraries are included out-of-the-box:
+The following hash-table libraries are included out-of-the-box:
 
 * TODO ONCE FINALIZED
 
 ## Built-in blueprints
 
-A _blueprint_ is a combination of a key type, value type, hash function, comparison function, and key set against which to measure each map's performance.
+A _blueprint_ is a combination of a key type, value type, hash function, comparison function, and key set against which to measure each table's performance.
 
 Three blueprints are included out-of-the-box:
 
-- The `uint32_uint32_murmur` blueprint (_32-bit integer key, 32-bit value_) tests how the maps perform when the hash function and key comparison function are cheap, traversing buckets is cheap (i.e. does not cause many cache misses), and moving keys and values is cheap. This blueprint disadvantages maps that store metadata in a separate array because doing so necessarily causes at least one extra cache miss per lookup.
+- The `uint32_uint32_murmur` blueprint (_32-bit integer key, 32-bit value_) tests how the tables perform when the hash function and key comparison function are cheap, traversing buckets is cheap (i.e. does not cause many cache misses), and moving keys and values is cheap. This blueprint disadvantages tables that store metadata in a separate array because doing so necessarily causes at least one extra cache miss per lookup.
 
- - The `uint64_struct448_murmur` blueprint (_64-bit integer key, 448-bit value_) tests how the maps perform when the hash function and key comparison function are cheap, traversing buckets is expensive (typically a cache miss per bucket), and moving keys and values is expensive. This blueprint disadvantages maps that do not store metadata in a separate array (or do but access the buckets array with every probe anyway to check the key) and that move elements around often (e.g. Robin Hood).
+ - The `uint64_struct448_murmur` blueprint (_64-bit integer key, 448-bit value_) tests how the tables perform when the hash function and key comparison function are cheap, traversing buckets is expensive (typically a cache miss per bucket), and moving keys and values is expensive. This blueprint disadvantages tables that do not store metadata in a separate array (or do but access the buckets array with every probe anyway to check the key) and that move elements around often (e.g. Robin Hood).
 
-- The `cstring_uint64_fnv1a` (_16-char c-string key, 64-bit value_) blueprint tests how the maps perform when the hash function and key comparison function are expensive. This blueprint disadvantages maps that lack a (metadata) mechanism to avoid most key comparisons or that rehash existing keys often.
+- The `cstring_uint64_fnv1a` (_16-char c-string key, 64-bit value_) blueprint tests how the tables perform when the hash function and key comparison function are expensive. This blueprint disadvantages tables that lack a (metadata) mechanism to avoid most key comparisons or that rehash existing keys often.
 
-## Adding a new map (via a shim)
+## Adding a new table (via a shim)
 
-Each hash map library plugs into the benchmarks via a custom _shim_ that provides a standard API for basic hash map operations.
+Each hash-table library plugs into the benchmarks via a custom _shim_ that provides a standard API for basic hash-table operations.
 
-To add a new map, follow these steps:
+To add a new table, follow these steps:
 
-1. Create a directory, with your chosen name for the shim, in the `shims` directory and, ideally, install the hash map library's headers there.
+1. Create a directory, with your chosen name for the shim, in the `shims` directory and, ideally, install the hash-table library's headers there.
 
 2. Create a file name `shim.h` in the new directory.
 
@@ -68,79 +68,80 @@ To add a new map, follow these steps:
 
     ```c++
     static constexpr const char *label =
-      // A string literal containing the label of the map to appear in the outputted graphs.
+      // A string literal containing the label of the table to appear in the outputted graphs.
     ;
  
     static constexpr const char *color =
-      // A string literal containing the color of the map's label and plot to appear in the outputted
+      // A string literal containing the color of the table's label and plot to appear in the outputted
       //graphs, e.g. rgb( 255, 0, 0 ).
     ;
     ```
 
-    For each blueprint, `new_shim< blueprint >` should contain the following members, where `blueprint` is the name of the blueprint, `map_type` is the map type for that blueprint, and `itr_type` is the type of the associated iterator:
+    For each blueprint, `new_shim< blueprint >` should contain the following members, where `blueprint` is the name of the blueprint, `table_type` is the table type for that blueprint, and `itr_type` is the type of the associated iterator:
 
     ```c++
-    static map_type create_map()
+    static table_type create_table()
     {
-      // Returns an initialized instance of a map that uses blueprint::hash_key as the hash function,
+      // Returns an initialized instance of a table that uses blueprint::hash_key as the hash function,
       // blueprint::cmpr_keys as the comparison function, and MAX_LOAD_FACTOR as the maximum load
       // factor.
     }
     
-    static void insert( map_type &map, const blueprint::key_type &key )
+    static void insert( table_type &table, const blueprint::key_type &key )
     {
-      // Inserts the specified key, along with a dummy value, into the map, replacing any matching
-      // key already in the map if it exists.
+      // Inserts the specified key, along with a dummy value, into the table, replacing any matching
+      // key already in the table if it exists.
     }
 
-    static void erase( map_type &map, const blueprint::key_type &key )
+    static void erase( table_type &table, const blueprint::key_type &key )
     {
-      // Erases the specified key and associated value from the map, if the key exists.
+      // Erases the specified key and associated value from the table, if the key exists.
     }
     
-    static itr_type find( map_type &map, const blueprint::key_type &key )
+    static itr_type find( table_type &table, const blueprint::key_type &key )
     {
       // Returns an iterator to the specified key and associated value, if the key exists,
-      // or an iterator indicating a nonexisting key (e.g. an end iterator, for maps that follow the
-      // std::unordered_map API), if the key does not exist.
+      // or an iterator indicating a nonexisting key (e.g. an end iterator, for tables that follow the
+      // std::unordered_table API), if the key does not exist.
     }
     
-    static itr_type begin_itr( map_type &map )
+    static itr_type begin_itr( table_type &table )
     {
-      // Returns an iterator to the first key and associated value in the map, or an iterator
-      // indicating a nonexisting key if the map is empty.
+      // Returns an iterator to the first key and associated value in the table, or an iterator
+      // indicating a nonexisting key if the table is empty.
     }
     
-    static bool is_itr_valid( map_type &map, itr_type &itr )
+    static bool is_itr_valid( table_type &table, itr_type &itr )
     {
-      // Returns true if the specified iterator points to a key inside the map.
+      // Returns true if the specified iterator points to a key inside the table.
     }
 
-    static void increment_itr( map_type &map, itr_type &itr )
+    static void increment_itr( table_type &table, itr_type &itr )
     {
-      // Increments the specified iterator to point to the next key in the map, or an iterator
+      // Increments the specified iterator to point to the next key in the table, or an iterator
       // indicating a nonexisting key if key to which the iterator currently points is the last one
-      // in the map.
+      // in the table.
     }
     
-    static blueprint::key_type &get_key_from_itr( map_type &map, itr_type &itr )
+    static blueprint::key_type &get_key_from_itr( table_type &table, itr_type &itr )
     {
       // Returns a reference to the key pointed to by the specified iterator.
     }
     
-    static blueprint::value_type &get_value_from_itr( map_type &map, itr_type &itr )
+    static blueprint::value_type &get_value_from_itr( table_type &table, itr_type &itr )
     {
       // Returns a reference to the value pointed to by the specified iterator.
     }
     
-    static void destroy_map( map_type &map )
+    static void destroy_table( table_type &table )
     {
-      // Frees all memory associated with the map.
-      // For C++ maps, if freeing memory is handled by map_type's destructor, this function can be
+      // Frees all memory associated with the table.
+      // For C++ tables, if freeing memory is handled by table_type's destructor, this function can be
       // left empty.
     }
+    ```
 
-Refer to the built-in shims for examples of how a shim can be implemented for C++ maps that follow the `std::unordered_map` API and for C maps, which typically require explicit template specializations for each blueprint.
+  Refer to the built-in shims for examples of how a shim can be implemented for C++ tables that follow the `std::unordered_map` API and for C tables, which typically require explicit template specializations for each blueprint.
 
 ## Adding a new blueprint
 
@@ -160,7 +161,7 @@ To add a new blueprint, follow these steps:
     ;
     
     using key_type =
-      // The type of the keys that the maps should contain.
+      // The type of the keys that the tables should contain.
     ;
     
     using value_type =

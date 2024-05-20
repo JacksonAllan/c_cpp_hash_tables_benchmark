@@ -1,4 +1,4 @@
-// hash_map_benchmarks/shims/cc/shim.h
+// c_cpp_hash_tables_benchmark/shims/cc/shim.h
 // Copyright (c) 2024 Jackson L. Allan.
 // Distributed under the MIT License (see the accompanying LICENSE file).
 
@@ -9,65 +9,66 @@ template< typename > struct cc_lib_map
 {
   static constexpr const char *label = "CC";
   static constexpr const char *color = "rgb( 174, 97, 175 )";
+  static constexpr bool tombstone_like_mechanism = false;
 };
 
-#define CC_SPECIALIZATION( blueprint )                                                                 \
-template<> struct cc_lib_map< blueprint >                                                              \
-{                                                                                                      \
-  using map_type = cc_map( cc_##blueprint##_key, blueprint::value_type );                              \
-                                                                                                       \
-  static map_type create_map()                                                                         \
-  {                                                                                                    \
-    map_type map;                                                                                      \
-    cc_init( &map );                                                                                   \
-    return map;                                                                                        \
-  }                                                                                                    \
-                                                                                                       \
-  static blueprint::value_type *find( map_type &map, const blueprint::key_type &key )                  \
-  {                                                                                                    \
-    return cc_get( &map, cc_##blueprint##_key{ key } );                                                \
-  }                                                                                                    \
-                                                                                                       \
-  static void insert( map_type &map, const blueprint::key_type &key )                                  \
-  {                                                                                                    \
-    cc_insert( &map, cc_##blueprint##_key{ key }, typename blueprint::value_type() );                  \
-  }                                                                                                    \
-                                                                                                       \
-  static void erase( map_type &map, const blueprint::key_type &key )                                   \
-  {                                                                                                    \
-    cc_erase( &map, cc_##blueprint##_key{ key } );                                                     \
-  }                                                                                                    \
-                                                                                                       \
-  static blueprint::value_type *begin_itr( map_type &map )                                             \
-  {                                                                                                    \
-    return cc_first( &map );                                                                           \
-  }                                                                                                    \
-                                                                                                       \
-  static bool is_itr_valid( map_type &map, blueprint::value_type *&itr )                               \
-  {                                                                                                    \
-    return itr && itr != cc_end( &map );                                                               \
-  }                                                                                                    \
-                                                                                                       \
-  static void increment_itr( map_type &map, blueprint::value_type *&itr )                              \
-  {                                                                                                    \
-    itr = cc_next( &map, itr );                                                                        \
-  }                                                                                                    \
-                                                                                                       \
-  static const blueprint::key_type &get_key_from_itr( map_type &map, blueprint::value_type *&itr )     \
-  {                                                                                                    \
-    return cc_key_for( &map, itr )->data;                                                              \
-  }                                                                                                    \
-                                                                                                       \
-  static const blueprint::value_type &get_value_from_itr( map_type &map, blueprint::value_type *&itr ) \
-  {                                                                                                    \
-    return *itr;                                                                                       \
-  }                                                                                                    \
-                                                                                                       \
-  static void destroy_map( map_type &map )                                                             \
-  {                                                                                                    \
-    cc_cleanup( &map );                                                                                \
-  }                                                                                                    \
-};                                                                                                     \
+#define CC_SPECIALIZATION( blueprint )                                                                     \
+template<> struct cc_lib_map< blueprint >                                                                  \
+{                                                                                                          \
+  using table_type = cc_map( cc_##blueprint##_key, blueprint::value_type );                                \
+                                                                                                           \
+  static table_type create_table()                                                                         \
+  {                                                                                                        \
+    table_type table;                                                                                      \
+    cc_init( &table );                                                                                     \
+    return table;                                                                                          \
+  }                                                                                                        \
+                                                                                                           \
+  static blueprint::value_type *find( table_type &table, const blueprint::key_type &key )                  \
+  {                                                                                                        \
+    return cc_get( &table, cc_##blueprint##_key{ key } );                                                  \
+  }                                                                                                        \
+                                                                                                           \
+  static void insert( table_type &table, const blueprint::key_type &key )                                  \
+  {                                                                                                        \
+    cc_insert( &table, cc_##blueprint##_key{ key }, typename blueprint::value_type() );                    \
+  }                                                                                                        \
+                                                                                                           \
+  static void erase( table_type &table, const blueprint::key_type &key )                                   \
+  {                                                                                                        \
+    cc_erase( &table, cc_##blueprint##_key{ key } );                                                       \
+  }                                                                                                        \
+                                                                                                           \
+  static blueprint::value_type *begin_itr( table_type &table )                                             \
+  {                                                                                                        \
+    return cc_first( &table );                                                                             \
+  }                                                                                                        \
+                                                                                                           \
+  static bool is_itr_valid( table_type &table, blueprint::value_type *&itr )                               \
+  {                                                                                                        \
+    return itr && itr != cc_end( &table );                                                                 \
+  }                                                                                                        \
+                                                                                                           \
+  static void increment_itr( table_type &table, blueprint::value_type *&itr )                              \
+  {                                                                                                        \
+    itr = cc_next( &table, itr );                                                                          \
+  }                                                                                                        \
+                                                                                                           \
+  static const blueprint::key_type &get_key_from_itr( table_type &table, blueprint::value_type *&itr )     \
+  {                                                                                                        \
+    return cc_key_for( &table, itr )->data;                                                                \
+  }                                                                                                        \
+                                                                                                           \
+  static const blueprint::value_type &get_value_from_itr( table_type &table, blueprint::value_type *&itr ) \
+  {                                                                                                        \
+    return *itr;                                                                                           \
+  }                                                                                                        \
+                                                                                                           \
+  static void destroy_table( table_type &table )                                                           \
+  {                                                                                                        \
+    cc_cleanup( &table );                                                                                  \
+  }                                                                                                        \
+};                                                                                                         \
 
 #ifdef UINT32_UINT32_MURMUR_ENABLED
 
