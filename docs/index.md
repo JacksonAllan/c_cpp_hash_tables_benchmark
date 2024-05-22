@@ -12195,8 +12195,8 @@ Finally, I must warn that some of the C tables raise portability concerns. <span
 The above conclusion may leave readers wondering about the differences between <span class="table_label">Verstable</span> and <span class="table_label">CC</span>'s <span class="table_label">cc_map</span>, which both use the same hybrid design, outside the context of performance. In short, <span class="table_label">Verstable</span> is a stand-alone hash-table library. It requires C99 or later, and it requires users to [instantiate a pseudo-template](https://github.com/JacksonAllan/Verstable/blob/main/api_reference.md#instantiating-a-hash-table-template) for every combination of key and value data types (as is common among high-performance C container libraries). It also offers full support for custom memory allocators. <span class="table_label">CC</span>, on the other hand, is a larger library that includes a range of generic containers. It uses [novel](https://github.com/JacksonAllan/CC#how-does-it-work) [techniques](https://github.com/JacksonAllan/CC/blob/main/articles/Better_C_Generics_Part_1_The_Extendible_Generic.md) to provide a simpler API and avoid the need for boilerplate from users. However, it requires C11 or later and compiler support `typeof` (which is standard as of C23), and its support for custom memory allocators is more limited.
 
 ## Acknowledgements
-XXX
-I would like to thank Joaquín M López Muñoz, Martin Leitner-Ankerl, and GitHub users attractivechaos and P-p-H-d for their valuable feedback during the drafting of this article.
+
+I would like to thank [Joaquín M López Muñoz](https://github.com/joaquintides), [Martin Leitner-Ankerl](https://github.com/martinus), and GitHub users [attractivechaos](https://github.com/attractivechaos) and [P-p-H-d](https://github.com/P-p-H-d) for their valuable feedback during the drafting of this article.
 
 ## Discussion
 
