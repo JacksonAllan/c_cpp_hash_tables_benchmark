@@ -47,6 +47,10 @@
 {
   width: 50%;
 }
+
+.footer {
+  display: none !important;
+}
 </style>
 
 <mark>DRAFT DRAFT DRAFT</mark>
