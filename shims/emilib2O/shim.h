@@ -2,7 +2,11 @@
 // Copyright (c) 2024 Jackson L. Allan.
 // Distributed under the MIT License (see the accompanying LICENSE file).
 
-#include "emilib2o.hpp"
+#if _WIN32
+#include <intrin.h>
+#endif
+
+#include "emilib2o_modified.hpp"
 
 template< typename blueprint > struct emilib2O
 {

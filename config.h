@@ -10,7 +10,7 @@
 #define KEY_COUNT_MEASUREMENT_INTERVAL 50000
 
 // The number of times to repeat the benchmarks.
-#define RUN_COUNT 14
+#define RUN_COUNT 1
 
 // Each data point in the outputted graphs is the average of the measurements for that point across all runs, excluding
 // the lowest and highest measurements.
@@ -18,7 +18,7 @@
 // highest measurement will be discarded).
 // It should be an even number below RUN_COUNT.
 // This mechanism reduces the impact of background noise interfering with the benchmarks.
-#define DISCARDED_RUNS_COUNT 4
+#define DISCARDED_RUNS_COUNT 0
 
 // The maximum load factor that all shims should, in theory, apply when initializing their maps.
 // In reality, some hash map libraries do not allow custom load factors.
@@ -64,16 +64,16 @@
 #define SHIM_1 ankerl_unordered_dense
 #define SHIM_2 absl_flat_hash_map
 #define SHIM_3 boost_unordered_flat_map
-#define SHIM_4 ska_bytell_hash_map
-#define SHIM_5 std_unordered_map
-#define SHIM_6 tsl_robin_map
-#define SHIM_7 cc_lib_map
-#define SHIM_8 stc_hmap
-#define SHIM_9 khash
-#define SHIM_10 mlib_dict
-#define SHIM_11 mlib_dict_oa
-#define SHIM_12 stb_ds_hm_sh // stb_ds does not automatically respect MAX_LOAD_FACTOR (stb_ds.h must be modified).
-#define SHIM_13 uthash
-#define SHIM_14 verstable
-#define SHIM_15 emhash
-#define SHIM_16 emilib2O
+#define SHIM_4 emilib2O // emilib2 does not automatically respect MAX_LOAD_FACTOR (the header must be modified).
+#define SHIM_5 ska_bytell_hash_map
+#define SHIM_6 std_unordered_map
+#define SHIM_7 tsl_robin_map
+#define SHIM_8 cc_lib_map
+#define SHIM_9 stc_hmap
+#define SHIM_10 khash
+#define SHIM_11 mlib_dict
+#define SHIM_12 mlib_dict_oa
+#define SHIM_13 stb_ds_hm_sh // stb_ds does not automatically respect MAX_LOAD_FACTOR (the header must be modified).
+#define SHIM_14 uthash
+#define SHIM_15 verstable
+// #define SHIM_15

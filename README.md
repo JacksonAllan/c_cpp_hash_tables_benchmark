@@ -72,8 +72,15 @@ To add a new table, follow these steps:
     ;
  
     static constexpr const char *color =
-      // A string literal containing the color of the table's label and plot to appear in the outputted
-      //graphs, e.g. rgb( 255, 0, 0 ).
+      // A string literal containing the CSS color of the table's label and plot to appear in the
+      // outputted graphs, e.g. rgb( 255, 0, 0 ).
+    ;
+
+    static constexpr bool tombstone_like_mechanism =
+      // A Boolean value indicating whether the table relies on tombstones or a tombstone-like
+      // mechanism for erasures.
+      // A tombstone-like mechanism is one that, like tombstones, leaves a residual impact on the
+      // performance of the table and potentially causes early rehashing.
     ;
     ```
 

@@ -1,6 +1,6 @@
 // hash_map_benchmarks/shims/stb_ds_hm_sh/stb_ds_modified.h
 // Copyright (c) 2024 Jackson L. Allan.
-// This version of stb_ds has been minimally modified to interface with hash_map_benchmarks.
+// This version of stb_ds has been minimally modified to interface with c_cpp_hash_tables_benchmark.
 // Distributed under the MIT or Public Domain license (see the end of this file).
 
 /* stb_ds.h - v0.67 - public domain data structures - Sean Barrett 2019
