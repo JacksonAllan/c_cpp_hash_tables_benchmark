@@ -58,7 +58,7 @@
 
 # An Extensive Benchmark of C (and Some C++) Hash Tables
 
-**Jackson Allan** · ?? May 2024
+**Jackson Allan** · <mark>??</mark> May 2024
 
 ## Introduction: Why Another Hash-Table Benchmark?
 
