@@ -130,8 +130,8 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
   This table, too, is an open-addressing table that stores hash-code fragments in a separate array and uses SIMD instructions to scan them for potential key matches multiple buckets at a time. However, it differs from <span class="table_label">absl::flat_hash_map</span> in several important ways. Firstly, keys are hashed not to individual buckets but to 15-bucket groups, which fill up contiguously from one end to the other:
 
   <table class="boost_absl_diagram" cellpadding="0" cellspacing="0">
-  <tr><td>boost</td><td><img src="boost_clustering.png"></td></tr>
-  <tr><td>absl</td><td><img src="absl_clustering.png"></td></tr>
+  <tr><td><span class="table_label">boost</span></td><td><img src="boost_clustering.png"></td></tr>
+  <tr><td><span class="table_label">absl</span></td><td><img src="absl_clustering.png"></td></tr>
   <tr><td colspan="2">Clustering of key-value pairs in boost::unordered_flat_map vs absl::flat_hash_map at a load factor of 0.4375.</td></tr>
   </table>
 
@@ -239,7 +239,7 @@ typedef struct UT_hash_handle {
 <td></td>
 </tr>
 <tr>
-<td colspan="3">The 56-byte struct that uthash requires to be embedded with every key-value pair (code comments omitted).</td>
+<td colspan="3">The 56-byte struct that <span class="table_label">uthash</span> requires to be embedded with every key-value pair (code comments omitted).</td>
 </tr>
 </table>
 
