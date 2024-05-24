@@ -130,9 +130,9 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
   This table, too, is an open-addressing table that stores hash-code fragments in a separate array and uses SIMD instructions to scan them for potential key matches multiple buckets at a time. However, it differs from <span class="table_label">absl::flat_hash_map</span> in several important ways. Firstly, keys are hashed not to individual buckets but to 15-bucket groups, which fill up contiguously from one end to the other:
 
   <table class="boost_absl_diagram" cellpadding="0" cellspacing="0">
-  <tr><td><span class="table_label">boost</span></td><td><img src="boost_clustering.png"></td></tr>
-  <tr><td><span class="table_label">absl</span></td><td><img src="absl_clustering.png"></td></tr>
-  <tr><td colspan="2">Clustering of key-value pairs in boost::unordered_flat_map vs absl::flat_hash_map at a load factor of 0.4375.</td></tr>
+  <tr><td>boost</td><td><img src="boost_clustering.png"></td></tr>
+  <tr><td>absl</td><td><img src="absl_clustering.png"></td></tr>
+  <tr><td colspan="2">Clustering of key-value pairs in <span class="table_label">boost::unordered_flat_map</span> vs <span class="table_label">absl::flat_hash_map</span> at a load factor of 0.4375.</td></tr>
   </table>
 
   Secondly, the hash-code fragments [consist of 7.99 bits](https://bannalia.blogspot.com/2022/11/inside-boostunorderedflatmap.html) rather than 7 bits. Thirdly, instead of tombstones, the table uses a group-level bloom filter that its authors call an "overflow byte", which also accelerates lookups of nonexisting keys (below, I consider this mechanism "tombstone-like" because erasures still leave a residual impact on the table's performance and cause more frequent full-table rehashing). The above details and more are documented via a [presentation](https://www.youtube.com/watch?v=Rg8MZ5pJIJA).
