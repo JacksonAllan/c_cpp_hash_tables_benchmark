@@ -90,15 +90,15 @@ As for the benchmarks themselves, they consist of the following:
 
 * _Time to erase 1,000 existing keys with N keys in the table_: In this benchmark, N unique keys are inserted into the table. At even intervals during this process, 1,000 keys are erased, and the time taken to complete this operation is recorded. These keys consist of a randomly selected 1,000-key sequence within the sequence of keys already inserted. After the keys are erased, they are reinserted into the table before the process of inserting unique keys continues.
 
-* _Time to replace 1,000 existing keys with N keys in the table_. In this benchmark, N unique keys are inserted into the table. At even intervals during this process, 1,000 keys are reinserted, and the time taken to complete this operation is recorded. These keys consist of a randomly selected 1,000-key sequence within the sequence of keys already inserted.
+* _Time to replace 1,000 existing keys with N keys in the table_: In this benchmark, N unique keys are inserted into the table. At even intervals during this process, 1,000 keys are reinserted, and the time taken to complete this operation is recorded. These keys consist of a randomly selected 1,000-key sequence within the sequence of keys already inserted.
 
-* _Time to erase 1,000 nonexisting keys with N keys in the table_. In this benchmark, N unique keys are inserted into the table. At even intervals during this process, the erase function is called for 1,000 keys that have not been inserted, and the time taken to complete this operation is recorded. These keys consist of a randomly selected 1,000-key sequence within a separate sequence of keys that are never inserted.
+* _Time to erase 1,000 nonexisting keys with N keys in the table_: In this benchmark, N unique keys are inserted into the table. At even intervals during this process, the erase function is called for 1,000 keys that have not been inserted, and the time taken to complete this operation is recorded. These keys consist of a randomly selected 1,000-key sequence within a separate sequence of keys that are never inserted.
 
-* _Time to look up 1,000 existing keys with N keys in the table_. In this benchmark, N unique keys are inserted into the table. At even intervals during this process, 1,000 keys are looked up, and the time taken to complete this operation is recorded. These keys consist of a randomly selected 1,000-key sequence within the sequence of keys already inserted.
+* _Time to look up 1,000 existing keys with N keys in the table_: In this benchmark, N unique keys are inserted into the table. At even intervals during this process, 1,000 keys are looked up, and the time taken to complete this operation is recorded. These keys consist of a randomly selected 1,000-key sequence within the sequence of keys already inserted.
 
-* _Time to look up 1,000 nonexisting keys with N keys in the table_. In this benchmark, N unique keys are inserted into the table. At even intervals during this process, the lookup function is called for 1,000 keys that have not been inserted, and the time taken to complete this operation is recorded. These keys consist of a randomly selected 1,000-key sequence within a separate sequence of keys that are never inserted.
+* _Time to look up 1,000 nonexisting keys with N keys in the table_: In this benchmark, N unique keys are inserted into the table. At even intervals during this process, the lookup function is called for 1,000 keys that have not been inserted, and the time taken to complete this operation is recorded. These keys consist of a randomly selected 1,000-key sequence within a separate sequence of keys that are never inserted.
 
-* _Time to iterate over 5,000 keys with N keys in the table_. In this benchmark, N unique keys are inserted into the table. At even intervals during this process, 5,000 keys in the table are iterated over, and the time taken to complete this operation is recorded. The position where the iteration begins is found by looking up a random key from the sequence of keys already inserted.
+* _Time to iterate over 5,000 keys with N keys in the table_: In this benchmark, N unique keys are inserted into the table. At even intervals during this process, 5,000 keys in the table are iterated over, and the time taken to complete this operation is recorded. The position where the iteration begins is found by looking up a random key from the sequence of keys already inserted.
 
 Of the aforementioned benchmarks, _Time to erase 1,000 existing keys with N keys in the table_, _Time to replace 1,000 existing keys with N keys in the table_, _Time to erase 1,000 nonexisting keys with N keys in the table_, _Time to look up 1,000 existing keys with N keys in the table_, and _Time to look up 1,000 nonexisting keys with N keys in the table_ are performed side-by-side as part of the same process of inserting N unique keys.
 
@@ -110,7 +110,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
 ### C++ Tables
 
-* [<span class="table_label">ankerl::unordered_dense</span>](https://github.com/martinus/unordered_dense) v4.1.2
+* [<span class="table_label">ankerl::unordered_dense</span>](https://github.com/martinus/unordered_dense) v4.1.2:
 
   This table employs Robin Hood ordering—which is an open-addressing variant that moves key-value pairs around to keep their displacements from the buckets to which they hash as constant as possible—in conjunction with linear probing. However, it makes two additions to the Robin Hood design. Firstly, rather than storing key-value pairs inside the table's buckets, it stores them contiguously in a separate array. The table buckets store indices into this array. Secondly, it stores an 8-bit fragment of each key's hash code to limit the need to compare keys directly. This table is the successor to an [earlier table from the same author](https://github.com/martinus/robin-hood-hashing), which I have excluded from the published benchmarks because it is deprecated and proved to be inferior in my earlier testing.
 
@@ -118,14 +118,14 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   On x86-64, this table's approximate memory overhead is eight bytes (or 12 bytes, for tables that can accommodate more than 2<sup>32</sup> key-value pairs), plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
-* [<span class="table_label">absl::flat_hash_map</span>](https://github.com/abseil/abseil-cpp) v20240116.2
+* [<span class="table_label">absl::flat_hash_map</span>](https://github.com/abseil/abseil-cpp) v20240116.2:
 
   Developed by Google, this table is thoroughly documented on the [Abseil website](https://abseil.io/about/design/swisstables) and via [two](https://www.youtube.com/watch?v=ncHmEUmJZf4) [presentations](https://www.youtube.com/watch?v=JZE3_0qvrMg). It is an open-addressing table that stores a 7-bit fragment of each key's hash code in a separate array and uses [SIMD](https://en.wikipedia.org/wiki/Single_instruction,_multiple_data) instructions to scan this array for potential key matches 16 buckets at a time. It relies on tombstones for erasure.
 
 
   This table's approximate memory overhead is one byte, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
-* [<span class="table_label">boost::unordered_flat_map</span>](https://www.boost.org/doc/libs/1_85_0/libs/unordered/doc/html/unordered.html) v1.85.0
+* [<span class="table_label">boost::unordered_flat_map</span>](https://www.boost.org/doc/libs/1_85_0/libs/unordered/doc/html/unordered.html) v1.85.0:
 
   This table, too, is an open-addressing table that stores hash-code fragments in a separate array and uses SIMD instructions to scan them for potential key matches multiple buckets at a time. However, it differs from <span class="table_label">absl::flat_hash_map</span> in several important ways. Firstly, keys are hashed not to individual buckets but to 15-bucket groups, which fill up contiguously from one end to the other:
 
@@ -141,7 +141,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   For the sake of easy distribution with these benchmarks, I have opted to use an [amalgamated single-header version](https://github.com/MikePopoloski/boost_unordered) of this table provided by a third-party.
 
-* [<span class="table_label">emilib2::HashMap</span>](https://github.com/ktprime/emhash/tree/master/thirdparty/emilib)
+* [<span class="table_label">emilib2::HashMap</span>](https://github.com/ktprime/emhash/tree/master/thirdparty/emilib):
 
   This table is yet another open-addressing table that uses SIMD instructions to scan multiple hash-code fragments at once for potential key matches. The library is still under development, and details about its implementation are sparse and liable to change. However, one distinguishing quality is that it uses an extra byte per bucket to store the displacement of the farthest key-value pair that hashed to that bucket, which allows early termination of probing during lookups of nonexisting keys. It relies on tombstones for erasure.
 
@@ -149,7 +149,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   The version benchmarked is [emilib2o.hpp](https://github.com/ktprime/emhash/blob/434a20571a8d6b83b308ee0655a7076b5177e1fc/thirdparty/emilib/emilib2o.hpp) `434a205`, which I modified to set the maximum load factor to 0.875.
 
-* [<span class="table_label">ska::bytell_hash_map</span>](https://github.com/skarupke/flat_hash_map/blob/master/bytell_hash_map.hpp)
+* [<span class="table_label">ska::bytell_hash_map</span>](https://github.com/skarupke/flat_hash_map/blob/master/bytell_hash_map.hpp):
 
   This table is the [culmination](https://probablydance.com/2018/05/28/a-new-fast-hash-table-in-response-to-googles-new-fast-hash-table) of its author's experiments with various hash table designs, including Robin Hood and SIMD-accelerated tables. It is documented most thoroughly by a [presentation](https://www.youtube.com/watch?v=M2fKMP47slQ) he delivered. The table is a hybrid of open addressing and [separate chaining](https://en.wikipedia.org/wiki/Hash_table#Separate_chaining). Keys overflowing from one bucket are stored in otherwise vacant buckets and chained together using 7-bit "jump distances" (indices into a hard-coded array of possible distances, in terms of buckets, to the next key in the chain). Groups of this metadata—i.e. 7-bit jump distances coupled with 1-bit flags—are stored interspersed with groups of buckets (every 16 bytes of metadata is followed by the 16 corresponding buckets). This design shares similarities with an older technique called [coalesced hashing](https://en.wikipedia.org/wiki/Coalesced_hashing), except that the chains do not coalesce.
 
@@ -157,13 +157,13 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   Unfortunately, the library appears to be unmaintained.
 
-* [<span class="table_label">std::unordered_map</span>](https://en.cppreference.com/w/cpp/container/unordered_map) from GCC 13.2.0
+* [<span class="table_label">std::unordered_map</span>](https://en.cppreference.com/w/cpp/container/unordered_map) from GCC 13.2.0:
 
   This is the go-to hash table for many developers because it is part of C++'s standard library. While implementations may differ in their minor details, the constraints imposed by the C++ Standard effectively dictate that this table uses node-based separate chaining, rather than open addressing.
 
   On a 64-bit achitecture, this table's approximate memory overhead is eight bytes per bucket and eight bytes, plus pointer-key-value padding and `malloc` header and padding, per key-value pair. However, because of the fragmentation of available memory caused by many tiny allocations, its actual memory impact may be greater.
 
-* [<span class="table_label">tsl::robin_map</span>](https://github.com/Tessil/robin-map) v1.3.0
+* [<span class="table_label">tsl::robin_map</span>](https://github.com/Tessil/robin-map) v1.3.0:
 
   This is another popular Robin Hood table. Unlike <span class="table_label">ankerl::unordered_dense</span>, it stores key-value pairs, displacements, and (under some conditions) hash codes together inside the buckets array. It is therefore a more conventional implementation of the Robin Hood design.
 
@@ -171,17 +171,17 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
 ### C Tables
 
-* <span class="table_label">cc_map</span> from [<span class="table_label">CC</span>](https://github.com/JacksonAllan/CC) <mark>v????</mark>
+* <span class="table_label">cc_map</span> from [<span class="table_label">CC</span>](https://github.com/JacksonAllan/CC) <mark>v????</mark>:
 
   This table implements <span class="table_label">Verstable</span> within the constraints of <span class="table_label">CC</span>'s API. See [below](#verstable_description) for more details.
 
-* <span class="table_label">hmap</span> from [<span class="table_label">STC</span>](https://github.com/stclib/STC) v5.0 beta 4
+* <span class="table_label">hmap</span> from [<span class="table_label">STC</span>](https://github.com/stclib/STC) v5.0 beta 4:
 
   This table is an open-addressing table using linear probing. However, it stores a 7-bit fragment of each key's hash code in a separate array to limit direct key comparisons. One unusual feature of this table is that instead of relying on tombstones, an erasure at a given bucket shifts subsequent key-value pairs whose probe sequences include that bucket backward to fill the gap. This technique is commonly used by Robin Hood tables but not conventional linear-probing tables.
 
   This table's approximate memory overhead is one byte, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
-* <span class="table_label">khash</span> from [<span class="table_label">klib</span>](https://github.com/attractivechaos/klib) v0.2.8
+* <span class="table_label">khash</span> from [<span class="table_label">klib</span>](https://github.com/attractivechaos/klib) v0.2.8:
 
   This is a very popular open-addressing table that uses quadratic probing by default. It stores keys and values in two separate arrays (in addition to a third metadata array), rather than interspersed together in one buckets array. This choice conserves memory by eliminating padding bytes, but it means that lookups of existing keys necessarily entail extra cache misses. The table relies on tombstones for erasures.
 
@@ -189,7 +189,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   Note that <span class="table_label">klib</span> also includes a newer hash-table that is called <span class="table_label">khashl</span> and uses linear probing without tombstones. This table is not included in these benchmarks.
 
-* <span class="table_label">DICT</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) <mark>v????</mark>
+* <span class="table_label">DICT</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) <mark>v????</mark>:
 
   This is another open-addressing table that uses quadratic probing by default. Like <span class="table_label">ankerl::unordered_dense</span>, it stores key-value pairs in an array seperate from the buckets array. The buckets array stores indices into the key-value pairs array, along with hash codes. Unlike <span class="table_label">ankerl::unordered_dense</span>, the table does not necessarily store key-value pairs contiguously because it relies on tombstones for erasure.
 
@@ -197,7 +197,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   This table's approximate memory overhead is eight bytes (or 16 bytes, for tables that can accommodate more than 2<sup>32</sup> key-value pairs), plus pointer-key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
-* <span class="table_label">DICT_OA</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) <mark>v????</mark>
+* <span class="table_label">DICT_OA</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) <mark>v????</mark>:
 
   Like <span class="table_label">DICT</span>, <span class="table_label">DICT_OA</span> is an open-addressing table using quadratic probing by default. However, it is more conventional in that it stores keys and values together inside the hash-table buckets. Its standout feature is that instead of storing per-bucket metadata, it requires users to reserve two keys to mark empty buckets and tombstones. Hence, the table can often store data more densely and, therefore, in a more cache-friendly manner. For the benchmarks involving integer keys, I have opted to reserve two integer values to act as these sentinels (rather than manually coupling each key with an extra flag) in order to allow the table to take advantage of this feature. However, when configured thusly, this table cannot technically accommodate the full range of keys that the other tables can accommodate.
 
@@ -205,7 +205,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   Note that the <span class="table_label">\_OA</span> suffix, as a means of distinguishing this table from <span class="table_label">M\*LIB</span>'s similarly named <span class="table_label">DICT</span>, is a misnomer that exists for API compatability with earlier versions of the library, in which <span class="table_label">DICT</span> used seperate chaining. Now, both <span class="table_label">DICT</span> and <span class="table_label">DICT_OA</span> are open-addressing tables.
 
-* <span class="table_label">hm</span> and <span class="table_label">sh</span> from [<span class="table_label">stb_ds</span>](https://github.com/nothings/stb/blob/master/stb_ds.h) v0.67
+* <span class="table_label">hm</span> and <span class="table_label">sh</span> from [<span class="table_label">stb_ds</span>](https://github.com/nothings/stb/blob/master/stb_ds.h) v0.67:
 
   This open-addressing table appears to use linear probing in conjunction with quadratic probing at the bucket-group level. Its remarkable feature, when it comes to performance, is that—like <span class="table_label">ankerl::unordered_dense</span>—it stores key-value pairs not directly in the hash-table buckets but contiguously in a separate array. This table is also split between one implementation for string keys and another implementation for keys of all other data types. It relies on tombstones for erasure.
 
@@ -213,7 +213,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   On x86-64, this table's approximate memory overhead is 16 bytes, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
-* [<span class="table_label">uthash</span>](https://troydhanson.github.io/uthash) v2.3.0
+* [<span class="table_label">uthash</span>](https://troydhanson.github.io/uthash) v2.3.0:
 
   This is the oldest and perhaps most popular C hash table included in the benchmarks. Like <span class="table_label">std::unordered_map</span>, it is a node-based, separate-chaining table. Compared to the other tables, the functionality it provides is rudimentary, with users having to write much of the scaffolding themselves. It is also the only [intrusive](https://stackoverflow.com/questions/5004162/what-does-it-mean-for-a-data-structure-to-be-intrusive) table included in these benchmarks.
 
@@ -243,7 +243,7 @@ typedef struct UT_hash_handle {
 </tr>
 </table>
 
-* <a name="verstable_description"></a>[<span class="table_label">Verstable</span>](https://github.com/JacksonAllan/Verstable) <mark>v????</mark>
+* <a name="verstable_description"></a>[<span class="table_label">Verstable</span>](https://github.com/JacksonAllan/Verstable) <mark>v????</mark>:
 
   Like <span class="table_label">ska::bytell_hash_map</span>, this table is a hybrid of open addressing and separate chaining that stores keys overflowing from one bucket in otherwise vacant buckets of the flat buckets array. However, rather than chaining key-value pairs using a 7-bit index into an array of "jump distances", it does so using an 11-bit integer denoting quadratic displacement. It also stores a 4-bit fragment of each key's hash code to limit key comparisons. Hence, it uses two bytes of metadata per bucket, rather than the one byte used by <span class="table_label">ska::bytell_hash_map</span>. The metadata is stored in a separate array, rather than interspersed with groups of buckets.
 
