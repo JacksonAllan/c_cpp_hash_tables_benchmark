@@ -10,7 +10,7 @@
 template< typename > struct khash
 {
   static constexpr const char *label = "khash";
-  static constexpr const char *color = "rgb( 145, 99, 127 )";
+  static constexpr const char *color = "rgb( 140, 140, 140 )";
   static constexpr bool tombstone_like_mechanism = true;
 };
 

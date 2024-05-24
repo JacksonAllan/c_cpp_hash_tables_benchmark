@@ -10,7 +10,7 @@
 #define KEY_COUNT_MEASUREMENT_INTERVAL 50000
 
 // The number of times to repeat the benchmarks.
-#define RUN_COUNT 1
+#define RUN_COUNT 14
 
 // Each data point in the outputted graphs is the average of the measurements for that point across all runs, excluding
 // the lowest and highest measurements.
@@ -18,7 +18,7 @@
 // highest measurement will be discarded).
 // It should be an even number below RUN_COUNT.
 // This mechanism reduces the impact of background noise interfering with the benchmarks.
-#define DISCARDED_RUNS_COUNT 0
+#define DISCARDED_RUNS_COUNT 4
 
 // The maximum load factor that all shims should, in theory, apply when initializing their maps.
 // In reality, some hash map libraries do not allow custom load factors.
