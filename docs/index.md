@@ -171,7 +171,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
 ### C Tables
 
-* <span class="table_label">cc_map</span> from [<span class="table_label">CC</span>](https://github.com/JacksonAllan/CC) v????
+* <span class="table_label">cc_map</span> from [<span class="table_label">CC</span>](https://github.com/JacksonAllan/CC) <mark>v????</mark>
 
   This table implements <span class="table_label">Verstable</span> within the constraints of <span class="table_label">CC</span>'s API. See [below](#verstable_description) for more details.
 
@@ -189,7 +189,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   Note that <span class="table_label">klib</span> also includes a newer hash-table that is called <span class="table_label">khashl</span> and uses linear probing without tombstones. This table is not included in these benchmarks.
 
-* <span class="table_label">DICT</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) v????
+* <span class="table_label">DICT</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) <mark>v????</mark>
 
   This is another open-addressing table that uses quadratic probing by default. Like <span class="table_label">ankerl::unordered_dense</span>, it stores key-value pairs in an array seperate from the buckets array. The buckets array stores indices into the key-value pairs array, along with hash codes. Unlike <span class="table_label">ankerl::unordered_dense</span>, the table does not necessarily store key-value pairs contiguously because it relies on tombstones for erasure.
 
@@ -197,7 +197,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   This table's approximate memory overhead is eight bytes (or 16 bytes, for tables that can accommodate more than 2<sup>32</sup> key-value pairs), plus pointer-key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
-* <span class="table_label">DICT_OA</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) v????
+* <span class="table_label">DICT_OA</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) <mark>v????</mark>
 
   Like <span class="table_label">DICT</span>, <span class="table_label">DICT_OA</span> is an open-addressing table using quadratic probing by default. However, it is more conventional in that it stores keys and values together inside the hash-table buckets. Its standout feature is that instead of storing per-bucket metadata, it requires users to reserve two keys to mark empty buckets and tombstones. Hence, the table can often store data more densely and, therefore, in a more cache-friendly manner. For the benchmarks involving integer keys, I have opted to reserve two integer values to act as these sentinels (rather than manually coupling each key with an extra flag) in order to allow the table to take advantage of this feature. However, when configured thusly, this table cannot technically accommodate the full range of keys that the other tables can accommodate.
 
@@ -243,7 +243,7 @@ typedef struct UT_hash_handle {
 </tr>
 </table>
 
-* <a name="verstable_description"></a>[<span class="table_label">Verstable</span>](https://github.com/JacksonAllan/Verstable) v????
+* <a name="verstable_description"></a>[<span class="table_label">Verstable</span>](https://github.com/JacksonAllan/Verstable) <mark>v????</mark>
 
   Like <span class="table_label">ska::bytell_hash_map</span>, this table is a hybrid of open addressing and separate chaining that stores keys overflowing from one bucket in otherwise vacant buckets of the flat buckets array. However, rather than chaining key-value pairs using a 7-bit index into an array of "jump distances", it does so using an 11-bit integer denoting quadratic displacement. It also stores a 4-bit fragment of each key's hash code to limit key comparisons. Hence, it uses two bytes of metadata per bucket, rather than the one byte used by <span class="table_label">ska::bytell_hash_map</span>. The metadata is stored in a separate array, rather than interspersed with groups of buckets.
 
@@ -251,7 +251,7 @@ typedef struct UT_hash_handle {
 
 ## Results
 
-Since the horizontal scale of the resulting graphs (each corresponding to one of the aforementioned benchmarks) is linear, not logarithmic, I ran the benchmarks for three different total key counts. Generally, the lower the key count is, the hotter the tables are in the cache. <mark>Here are the results</mark>:
+Since the horizontal scale of the resulting graphs (each corresponding to one of the aforementioned benchmarks) is linear, not logarithmic, I ran the benchmarks for three different total key counts. Generally, the lower the key count is, the hotter the tables are in the cache. Here are the results:
 
 * [0 to 200,000 keys](result_2024-05-24T10_30_32.html)
 * [0 to 2,000,000 keys](result_2024-05-24T06_01_13.html)
