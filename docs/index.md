@@ -189,7 +189,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
 * <span class="table_label">DICT</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) v0.7.3:
 
-  This is another open-addressing table that uses quadratic probing by default. Like <span class="table_label">ankerl::unordered_dense</span> and <span class="table_label">stb_ds</span>'s <span class="table_label">hm</span> and <span class="table_label">sh</span>, it stores key-value pairs in an array seperate from the buckets array. The buckets array stores indices into the key-value pairs array, along with hash codes. Unlike those two other tables, it does not store key-value pairs contiguously. This is because when erasing, it does not move the last key-value pair in the array backward to fill the gap created (a process that requires another lookup to update the index of the moved pair stored in the buckets array).
+  This is another open-addressing table that uses quadratic probing by default. Like <span class="table_label">ankerl::unordered_dense</span> and <span class="table_label">stb_ds</span>'s <span class="table_label">hm</span> and <span class="table_label">sh</span>, it stores key-value pairs in an array separate from the buckets array. The buckets array stores indices into the key-value pairs array, along with hash codes. Unlike those two other tables, it does not store key-value pairs contiguously. This is because when erasing, it does not move the last key-value pair in the array backward to fill the gap created (a process that requires another lookup to update the index of the moved pair stored in the buckets array).
 
   This table, too, can only accomodate 2<sup>32</sup> key-value pairs by default, and enabling support for a higher number impacts memory usage and cache efficiency. For these benchmarks, I used the default limit.
 
@@ -201,7 +201,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   This table's approximate memory overhead is only the key-value padding per bucket and the size of a key-value pair per vacant bucket.
 
-  Note that the <span class="table_label">\_OA</span> suffix, as a means of distinguishing this table from <span class="table_label">M\*LIB</span>'s similarly named <span class="table_label">DICT</span>, is a misnomer that exists for API compatability with earlier versions of the library, in which <span class="table_label">DICT</span> used seperate chaining. Now, both <span class="table_label">DICT</span> and <span class="table_label">DICT_OA</span> are open-addressing tables.
+  Note that the <span class="table_label">\_OA</span> suffix, as a means of distinguishing this table from <span class="table_label">M\*LIB</span>'s similarly named <span class="table_label">DICT</span>, is a misnomer that exists for API compatability with earlier versions of the library, in which <span class="table_label">DICT</span> used separate chaining. Now, both <span class="table_label">DICT</span> and <span class="table_label">DICT_OA</span> are open-addressing tables.
 
 * <span class="table_label">hm</span> and <span class="table_label">sh</span> from [<span class="table_label">stb_ds</span>](https://github.com/nothings/stb/blob/master/stb_ds.h) v0.67:
 
