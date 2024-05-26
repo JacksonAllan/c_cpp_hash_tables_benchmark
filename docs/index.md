@@ -1,8 +1,7 @@
 <style>
 .table_label
 {
-  /*font-weight: 500;*/
-  color: darkred;
+  font-weight: 500;
 }
 
 .boost_absl_diagram td
@@ -146,7 +145,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   This table is yet another open-addressing table that uses SIMD instructions to scan multiple hash-code fragments at once for potential key matches. The library is still under development, and details about its implementation are sparse and liable to change. Its approximate memory overhead is 1.25 bytes, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
-  The version benchmarked is [emilib2o.hpp](https://github.com/ktprime/emhash/blob/434a20571a8d6b83b308ee0655a7076b5177e1fc/thirdparty/emilib/emilib2o.hpp) `434a205`, which I modified to set the maximum load factor to 0.875.
+  The version benchmarked is [emilib2o.hpp 434a205](https://github.com/ktprime/emhash/blob/434a20571a8d6b83b308ee0655a7076b5177e1fc/thirdparty/emilib/emilib2o.hpp), which I modified to set the maximum load factor to 0.875.
 
 * [<span class="table_label">ska::bytell_hash_map</span>](https://github.com/skarupke/flat_hash_map/blob/master/bytell_hash_map.hpp):
 
@@ -13677,7 +13676,7 @@ The following section contains my analysis of the results, especially the 0-to-2
 
 * <span class="table_label">DICT_OA</span> from <span class="table_label">M\*LIB</span>: This table has very fast lookups of integer keys—the fastest among all the tables in the 0-to-20,000,00-key benchmarks when the buckets are small. In this regard, the table is probably benefiting from the better cache performance that results from the choice to have users reserve sentinel values instead of storing metadata. However, it is relatively slow for looking up or erasing nonexisting keys, and its insertion and iteration speed is average. Its erasures of integer keys are very fast but rely on tombstones.
 
-* <span class="table_label">hm</span> and <span class="table_label">sh</span> from <span class="table_label">stb_ds</span>: **hm** is slow—the slowest among the open-addressing tables—across most benchmarks. In particular, its lookups of existing and nonexisting keys and erasures of nonexisting keys are in the same poor-performance ballpark as the node-based tables. **sh** fares somewhat better, with fast insertions, replacements, and lookups of existing keys, but still displays average performance when it comes to erasing and looking up nonexisting keys. Like <span class="table_label">ankerl::unordered_dense</span>, these tables offer near-perfect iteration speed because they store key-value pairs contiguously.
+* <span class="table_label">hm</span> and <span class="table_label">sh</span> from <span class="table_label">stb_ds</span>: <span class="table_label">hm</span> is slow—the slowest among the open-addressing tables—across most benchmarks. In particular, its lookups of existing and nonexisting keys and erasures of nonexisting keys are in the same poor-performance ballpark as the node-based tables. <span class="table_label">sh</span> fares somewhat better, with fast insertions, replacements, and lookups of existing keys, but still displays average performance when it comes to erasing and looking up nonexisting keys. Like <span class="table_label">ankerl::unordered_dense</span>, these tables offer near-perfect iteration speed because they store key-value pairs contiguously.
 
 * <span class="table_label">uthash</span>: My [comments](#std_unordered_map_analysis) about the poor performance of <span class="table_label">std::unordered_map</span> also apply to <span class="table_label">uthash</span>. However, <span class="table_label">uthash</span>'s iteration is about twice as fast as <span class="table_label">std::unordered_map</span>'s iteration (albeit still extremely slow). Its author appears to be aware that its performance is no longer competitive as its [documentation](https://troydhanson.github.io/uthash/userguide.html) includes the following note:
 
