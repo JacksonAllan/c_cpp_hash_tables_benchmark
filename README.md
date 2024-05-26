@@ -2,19 +2,13 @@
 
 This repository contains a comparative, extendible benchmarking suite for C and C++ hash-table libraries.
 
-The benchmarks test the speed of inserting keys, replacing keys, looking up existing keys, look up nonexisting keys, deleting existing keys, deleting nonexisting keys, and iteration.
+The benchmarks measure the speed of inserting keys, replacing keys, looking up existing keys, looking up nonexisting keys, deleting existing keys, deleting nonexisting keys, and iteration.
 
 The following is an example of one outputted graph:
 
-<picture><img src="example_graph.svg" alt="Example graph"></picture>
+<// picture><img src="example_graph.svg" alt="Example graph"></picture>
 
-Complete results can be found here: [20 000 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-17T21_16_42_20000000), [2 000 000 keys](https://verstablebenchmarks.netlify.app/https://verstablebenchmarks.netlify.app/result_2024-01-17t23_51_00_2000000), and [200 000 keys](https://verstablebenchmarks.netlify.app/result_2024-01-18T00_09_43_200000).
-
-## Installing
-
-1. Download or clone the repository.
-
-2. Install [Boost](https://www.boost.org/) if necessary, or disable the `boost_unordered_flat_map` shim by editing `config.h`.
+Complete results from the benchmarks when run on my own computer, as well as more details about the benchmarks themselves, can be found in the [accompanying article].
 
 ## Building
 
@@ -22,15 +16,15 @@ Using GCC, compile with `g++ -I. -std=c++20 -static -O3 -DNDEBUG -Wall -Wpedanti
 
 ## Running
 
-Close background processes, lock your CPU's frequency, and then run the executable. Under the out-of-the-box configuration, the benchmarks take approximately an hour to complete on my AMD Ryzen 7 5800H with the CPU frequency locked at 90%.
+Close background processes, lock your CPU's frequency, and then run the executable. Under the out-of-the-box configuration, the benchmarks take approximately three hours to complete on my AMD Ryzen 7 5800H with the CPU frequency locked at 90%.
 
-The resulting graphs and heatmap are outputted as a HMTL file, and the raw data is outputted as a CSV file. Both these files are named with a GMT timestamp and placed in the current working directory.
+The resulting graphs and heatmap are outputted as a HMTL file, and the raw data is outputted as a CSV file. Both of these files are named with a GMT timestamp and placed in the current working directory.
 
 The graphs are interactive. Hover over a label to highlight the associated plot, and click the label to toggle the plot's visibility. The graphs automatically scale to the visible plots.
 
 ## Configuring
 
-Modify global settings, including the total key count, the measurement frequency, the maximum load factor, and the blueprints and shims (see below) enabled by editing `config.h`.
+To modify global settings, including the total key count, the measurement frequency, the maximum load factor, and the blueprints and shims (see below) enabled, edit `config.h`.
 
 ## Built-in tables
 
@@ -52,15 +46,15 @@ Three blueprints are included out-of-the-box:
 
 ## Adding a new table (via a shim)
 
-Each hash-table library plugs into the benchmarks via a custom _shim_ that provides a standard API for basic hash-table operations.
+Each hash-table library plugs into the benchmarks via a custom _shim_ that provides a standard API for basic operations.
 
 To add a new table, follow these steps:
 
-1. Create a directory, with your chosen name for the shim, in the `shims` directory and, ideally, install the hash-table library's headers there.
+1. Create a directory, with your chosen name for the shim, in the `shims` directory and, ideally, install the hash-table library there.
 
-2. Create a file name `shim.h` in the new directory.
+2. Create a file named `shim.h` in the new directory.
 
-3. Insert the name of the shim to an empty shim slot in `config.h`.
+3. Insert the name of the shim into an empty shim slot (or replace the name of an existing shim in an occupied slot) in `config.h`.
 
 4. In `shim.h`, define a struct template with the name of the shim (`new_shim` in the below documentation) and that satisfies the following requirements:
 
@@ -80,7 +74,7 @@ To add a new table, follow these steps:
       // A Boolean value indicating whether the table relies on tombstones or a tombstone-like
       // mechanism for erasures.
       // A tombstone-like mechanism is one that, like tombstones, leaves a residual impact on the
-      // performance of the table and potentially causes early rehashing.
+      // performance of the table and can cause early rehashing.
     ;
     ```
 
@@ -126,8 +120,8 @@ To add a new table, follow these steps:
     static void increment_itr( table_type &table, itr_type &itr )
     {
       // Increments the specified iterator to point to the next key in the table, or an iterator
-      // indicating a nonexisting key if key to which the iterator currently points is the last one
-      // in the table.
+      // indicating a nonexisting key if the key to which the iterator currently points is the last
+      // one in the table.
     }
     
     static blueprint::key_type &get_key_from_itr( table_type &table, itr_type &itr )
@@ -156,7 +150,7 @@ To add a new blueprint, follow these steps:
 
 1. Create a directory with your chosen name for the blueprint in the `blueprint` directory.
 
-2. Create a file name `blueprint.h` in the new directory.
+2. Create a file named `blueprint.h` in the new directory.
 
 3. Insert the name of the blueprint into an empty blueprint slot in `config.h`.
 
@@ -164,11 +158,11 @@ To add a new blueprint, follow these steps:
 
     ```c++
     static constexpr const char *label =
-      // A string literal containing the label of the blueprint toappear in the outputted graphs.
+      // A string literal containing the label of the blueprint to appear in the outputted graphs.
     ;
     
     using key_type =
-      // The type of the keys that the tables should contain.
+      // The type of keys that the tables should contain.
     ;
     
     using value_type =
@@ -202,4 +196,4 @@ To add a new blueprint, follow these steps:
 
 ## Sharing results
 
-The graphs embedded in the outputted HTML file are self-contained SVGs, so they can be trivially extracted and turned into standalone SVG files or embedded into other HTML files. They can even be used in GitHub READMEs (via `<img src="graph.svg">`), albeit without the interactive features.
+The graphs and heatmap contained in the outputted HTML file can be trivially extracted and turned into standalone SVG files or embedded into other HTML files. They can even be used in GitHub READMEs (via `<img src="graph.svg">`), albeit without the interactive features.

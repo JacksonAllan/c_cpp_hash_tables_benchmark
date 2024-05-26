@@ -106,36 +106,23 @@
   M_VAR1ANT_DEFINE_SET(name, __VA_ARGS__)                                     \
   M_VAR1ANT_DEFINE_EMPLACE(name, __VA_ARGS__)                                 \
   M_VAR1ANT_DEFINE_TEST_P(name, __VA_ARGS__)                                  \
-  M_VAR1ANT_IF_ALL(INIT, __VA_ARGS__)                                         \
-  (M_VAR1ANT_DEFINE_INIT_FIELD(name, __VA_ARGS__),)                           \
+  M_VAR1ANT_IF_ALL(INIT, __VA_ARGS__)(M_VAR1ANT_DEFINE_INIT_FIELD, M_EAT)(name, __VA_ARGS__) \
   M_VAR1ANT_DEFINE_INIT_SETTER_FIELD(name, __VA_ARGS__)                       \
   M_VAR1ANT_DEFINE_SETTER_FIELD(name, __VA_ARGS__)                            \
   M_VAR1ANT_DEFINE_GETTER_FIELD(name, __VA_ARGS__)                            \
   M_VAR1ANT_DEFINE_RESET_FUNC(name, __VA_ARGS__)                              \
-  M_VAR1ANT_IF_ALL(HASH, __VA_ARGS__)                                         \
-  (M_VAR1ANT_DEFINE_HASH(name, __VA_ARGS__),)                                 \
-  M_VAR1ANT_IF_ALL(EQUAL, __VA_ARGS__)                                        \
-  (M_VAR1ANT_DEFINE_EQUAL(name, __VA_ARGS__),)                                \
-  M_VAR1ANT_IF_ALL(GET_STR, __VA_ARGS__)                                      \
-  (M_VAR1ANT_DEFINE_GET_STR(name, __VA_ARGS__),)                              \
-  M_VAR1ANT_IF_ALL2(PARSE_STR, INIT, __VA_ARGS__)                             \
-  (M_VAR1ANT_DEFINE_PARSE_STR(name, __VA_ARGS__),)                            \
-  M_VAR1ANT_IF_ALL(OUT_STR, __VA_ARGS__)                                      \
-  (M_VAR1ANT_DEFINE_OUT_STR(name, __VA_ARGS__),)                              \
-  M_VAR1ANT_IF_ALL2(IN_STR, INIT, __VA_ARGS__)                                \
-  (M_VAR1ANT_DEFINE_IN_STR(name, __VA_ARGS__),)                               \
-  M_VAR1ANT_IF_ALL(OUT_SERIAL, __VA_ARGS__)                                   \
-  (M_VAR1ANT_DEFINE_OUT_SERIAL(name, __VA_ARGS__),)                           \
-  M_VAR1ANT_IF_ALL2(IN_SERIAL, INIT, __VA_ARGS__)                             \
-  (M_VAR1ANT_DEFINE_IN_SERIAL(name, __VA_ARGS__),)                            \
-  M_VAR1ANT_IF_ALL(INIT_MOVE, __VA_ARGS__)                                    \
-  (M_VAR1ANT_DEFINE_INIT_MOVE(name, __VA_ARGS__),)                            \
-  M_VAR1ANT_IF_ALL(INIT_MOVE, __VA_ARGS__)                                    \
-  (M_VAR1ANT_DEFINE_MOVE(name, __VA_ARGS__),)                                 \
-  M_VAR1ANT_IF_ALL(INIT_MOVE, __VA_ARGS__)                                    \
-  (M_VAR1ANT_DEFINE_MOVER(name, __VA_ARGS__),)                                \
-  M_VAR1ANT_IF_ALL(SWAP, __VA_ARGS__)                                         \
-  (M_VAR1ANT_DEFINE_SWAP(name, __VA_ARGS__),)
+  M_VAR1ANT_IF_ALL(HASH, __VA_ARGS__)(M_VAR1ANT_DEFINE_HASH, M_EAT)(name, __VA_ARGS__) \
+  M_VAR1ANT_IF_ALL(EQUAL, __VA_ARGS__)(M_VAR1ANT_DEFINE_EQUAL, M_EAT)(name, __VA_ARGS__) \
+  M_VAR1ANT_IF_ALL(GET_STR, __VA_ARGS__)(M_VAR1ANT_DEFINE_GET_STR, M_EAT)(name, __VA_ARGS__) \
+  M_VAR1ANT_IF_ALL2(PARSE_STR, INIT, __VA_ARGS__)(M_VAR1ANT_DEFINE_PARSE_STR, M_EAT)(name, __VA_ARGS__) \
+  M_VAR1ANT_IF_ALL(OUT_STR, __VA_ARGS__)(M_VAR1ANT_DEFINE_OUT_STR, M_EAT)(name, __VA_ARGS__) \
+  M_VAR1ANT_IF_ALL2(IN_STR, INIT, __VA_ARGS__)(M_VAR1ANT_DEFINE_IN_STR, M_EAT)(name, __VA_ARGS__) \
+  M_VAR1ANT_IF_ALL(OUT_SERIAL, __VA_ARGS__)(M_VAR1ANT_DEFINE_OUT_SERIAL, M_EAT)(name, __VA_ARGS__) \
+  M_VAR1ANT_IF_ALL2(IN_SERIAL, INIT, __VA_ARGS__)(M_VAR1ANT_DEFINE_IN_SERIAL, M_EAT)(name, __VA_ARGS__) \
+  M_VAR1ANT_IF_ALL(INIT_MOVE, __VA_ARGS__)(M_VAR1ANT_DEFINE_INIT_MOVE, M_EAT)(name, __VA_ARGS__) \
+  M_VAR1ANT_IF_ALL(INIT_MOVE, __VA_ARGS__)(M_VAR1ANT_DEFINE_MOVE, M_EAT)(name, __VA_ARGS__) \
+  M_VAR1ANT_IF_ALL(INIT_MOVE, __VA_ARGS__)(M_VAR1ANT_DEFINE_MOVER, M_EAT)(name, __VA_ARGS__) \
+  M_VAR1ANT_IF_ALL(SWAP, __VA_ARGS__)(M_VAR1ANT_DEFINE_SWAP, M_EAT)(name, __VA_ARGS__)
 
 
 /* Get the field name, the type, the oplist or the methods
@@ -199,7 +186,17 @@
   typedef struct M_F(name, _s) *M_F(name, _ptr);                              \
   typedef const struct M_F(name, _s) *M_F(name, _srcptr);                     \
   /* Define internal type for oplist */                                       \
-  typedef name_t M_F(name, _ct);
+  typedef name_t M_F(name, _ct);                                              \
+  /* Save alias for the types of arguments */                                 \
+  M_MAP3(M_VAR1ANT_DEFINE_GENTYPE_ELE, name, __VA_ARGS__)
+
+#define M_VAR1ANT_DEFINE_GENTYPE_ELE(name, num, a)                            \
+  typedef                                                                     \
+  M_IF_METHOD(GENTYPE, M_VAR1ANT_GET_OPLIST a)( M_GET_GENTYPE M_VAR1ANT_GET_OPLIST a, M_VAR1ANT_GET_TYPE a) \
+  M_C4(m_var1ant_, name, _gentype_, num);                                     \
+  typedef const                                                               \
+  M_IF_METHOD(GENTYPE, M_VAR1ANT_GET_OPLIST a)( M_GET_GENTYPE M_VAR1ANT_GET_OPLIST a, M_VAR1ANT_GET_TYPE a) \
+  M_C4(m_var1ant_, name, _const_gentype_, num);
 
 #define M_VAR1ANT_DEFINE_UNION_ELE(name, a)                                   \
   , M_C4(name, _, M_VAR1ANT_GET_FIELD a, _value)
@@ -325,11 +322,18 @@
 
 /* Define the INIT_SET of a given type function. */
 #define M_VAR1ANT_DEFINE_INIT_SETTER_FIELD(name, ...)                         \
-  M_MAP2(M_VAR1ANT_DEFINE_INIT_SETTER_FIELD_FUNC, name, __VA_ARGS__)
+  M_MAP3(M_VAR1ANT_DEFINE_INIT_SETTER_FIELD_FUNC, name, __VA_ARGS__)
 
-#define M_VAR1ANT_DEFINE_INIT_SETTER_FIELD_FUNC(name, a)                      \
+#define M_VAR1ANT_DEFINE_INIT_SETTER_FIELD_FUNC(name, num, a)                 \
   M_INLINE void                                                               \
   M_C3(name, _init_set_, M_VAR1ANT_GET_FIELD a)(M_F(name,_ct) my,             \
+                                               M_VAR1ANT_GET_TYPE a const M_VAR1ANT_GET_FIELD a  ) { \
+    my->type = M_C4(name, _, M_VAR1ANT_GET_FIELD a, _value);                  \
+    M_VAR1ANT_CALL_INIT_SET(a, my -> value. M_VAR1ANT_GET_FIELD a,            \
+                           M_VAR1ANT_GET_FIELD a);                            \
+  }                                                                           \
+  M_INLINE void                                                               \
+  M_C4(m_var1ant_, name, _init_set_, num)(M_F(name,_ct) my,                   \
                                                M_VAR1ANT_GET_TYPE a const M_VAR1ANT_GET_FIELD a  ) { \
     my->type = M_C4(name, _, M_VAR1ANT_GET_FIELD a, _value);                  \
     M_VAR1ANT_CALL_INIT_SET(a, my -> value. M_VAR1ANT_GET_FIELD a,            \
@@ -776,6 +780,8 @@ M_INLINE void                                                                 \
    NAME(name),                                                                \
    TYPE(M_F(name,_ct)), GENTYPE(struct M_F(name,_s)*),                        \
    EMPTY_P(M_F(name,_empty_p)),                                               \
+   SIZE( M_NARGS(__VA_ARGS__) ),                                              \
+   INIT_WITH( API_1(M_VAR1ANT_INIT_WITH) ),                                   \
    M_IF_METHOD_ALL(HASH, __VA_ARGS__)(HASH(M_F(name, _hash)),),               \
    M_IF_METHOD_ALL(EQUAL, __VA_ARGS__)(EQUAL(M_F(name, _equal_p)),),          \
    M_IF_METHOD_ALL(GET_STR, __VA_ARGS__)(GET_STR(M_F(name, _get_str)),),      \
@@ -807,6 +813,29 @@ M_INLINE void                                                                 \
 #define M_VAR1ANT_IF_ALL2(method1, method2,  ...)                             \
   M_IF(M_REDUCE2(M_VAR1ANT_TEST_METHOD2_P, M_AND, (method1, method2), __VA_ARGS__))
 
+
+/********************************** INTERNAL *********************************/
+
+/* INIT_WITH macro using _Generic
+   Expand as:
+    _Generic ( (x),
+        M_C4(m_var1ant_, name, _gentype_, num) : M_C4(m_var1ant_, name, _init_set_, num)(x, M_AS_TYPE() ),
+        ...
+    )
+*/
+#define M_VAR1ANT_INIT_WITH(oplist, dest, src)                                \
+  M_VAR1ANT_INIT_WITH_B(M_GET_NAME oplist, M_GET_SIZE oplist, dest, src)
+#define M_VAR1ANT_INIT_WITH_B(name, num, dest, src)                           \
+  M_G3N_BEGIN_PROTECTED_CODE                                                  \
+  _Generic( (src),                                                            \
+  M_MAP2(M_VAR1ANT_INIT_WITH_FUNC, (name,dest,src), M_SEQ(1, num))            \
+  struct m_var1ant_dummy_s *: /* cannot happen */ (void)0 )                   \
+  M_G3N_END_PROTECTED_CODE
+#define M_VAR1ANT_INIT_WITH_FUNC(triplet, num)                                \
+  M_VAR1ANT_INIT_WITH_FUNC_EXPAND(M_TRIPLE_1 triplet, M_TRIPLE_2 triplet, M_TRIPLE_3 triplet, num)
+#define M_VAR1ANT_INIT_WITH_FUNC_EXPAND(name, dest, src, num)                 \
+  M_C4(m_var1ant_, name, _gentype_, num) : M_C4(m_var1ant_, name, _init_set_, num)(dest, M_AS_TYPE(M_C4(m_var1ant_, name, _gentype_, num), src) ), \
+  M_C4(m_var1ant_, name, _const_gentype_, num): M_C4(m_var1ant_, name, _init_set_, num)(dest, M_AS_TYPE(M_C4(m_var1ant_, name, _const_gentype_, num), src) ),
 
 /********************************** INTERNAL *********************************/
 

@@ -71,7 +71,7 @@
 /* Define M*LIB version */
 #define M_CORE_VERSION_MAJOR 0
 #define M_CORE_VERSION_MINOR 7
-#define M_CORE_VERSION_PATCHLEVEL 2
+#define M_CORE_VERSION_PATCHLEVEL 3
 
 /* M_ASSUME is equivalent to M_ASSERT, but gives hints to compiler
    about how to optimize the code if NDEBUG is defined.
@@ -132,14 +132,26 @@
 # define M_ATTR_NO_RETURN 
 #endif
 
-/* The cold attribute on functions is used to inform the compiler
-   that the function is unlikely to be executed. */
+/* The hot/cold attribute on functions is used to inform the compiler
+   that the function is likely/unlikely to be executed. */
 #if defined(__GNUC__)
+# define M_ATTR_HOT_FUNCTION     __attribute__ ((hot))
 # define M_ATTR_COLD_FUNCTION    __attribute__ ((cold))
 #else
+# define M_ATTR_HOT_FUNCTION
 # define M_ATTR_COLD_FUNCTION
 #endif
 
+
+/* Prefetch . */
+#if defined(__GNUC__)
+# define M_PREFETCH(p)           __builtin_prefetch((p), 0, 0)
+#else
+# define M_PREFETCH(p) do {                                                   \
+    volatile char m_c = *(volatile char *) (p);                               \
+    (void) m_c;                                                               \
+  } while (0)
+#endif
 
 /* Ignore some warnings detected by some compilers in the library.
  * Whatever we do, there is some warnings that cannot be fixed.
@@ -226,6 +238,24 @@
 /* No warnings disabled */
 #define M_BEGIN_PROTECTED_CODE
 #define M_END_PROTECTED_CODE
+
+#endif
+
+/* Warnings disabled for CLANG in C mode:
+   Due to the genericity of the _Generic generation,
+   we cannot avoid generating both T and const T in the generic association. */
+#if defined(__clang__) && __clang_major__ >= 15
+#define M_G3N_BEGIN_PROTECTED_CODE                                            \
+  _Pragma("clang diagnostic push")                                            \
+  _Pragma("clang diagnostic ignored \"-Wunreachable-code-generic-assoc\"")    
+
+#define M_G3N_END_PROTECTED_CODE                                              \
+  _Pragma("clang diagnostic pop")
+
+#else
+
+#define M_G3N_BEGIN_PROTECTED_CODE
+#define M_G3N_END_PROTECTED_CODE
 
 #endif
 
@@ -2893,11 +2923,15 @@ M_PARSE_DEFAULT_TYPE_DEF(m_core_parse_ldouble, long double, strtold, )
 
 
 /* C++ doesn't support flexible array within a structure.
-   Let's define at least one element for an array. */
+   Let's define at least one element for an array.
+   It doesn't also support VLA usage in function prototype.
+ */
 #ifdef __cplusplus
 # define M_MIN_FLEX_ARRAY_SIZE 1
+# define M_VLA(n)
 #else
 # define M_MIN_FLEX_ARRAY_SIZE 
+# define M_VLA(n) n
 #endif
 
 #if M_USE_STDARG && M_USE_STDIO

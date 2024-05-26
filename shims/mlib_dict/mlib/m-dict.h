@@ -25,7 +25,6 @@
 #ifndef MSTARLIB_DICT_H
 #define MSTARLIB_DICT_H
 
-#include "m-list.h"
 #include "m-array.h"
 
 
@@ -257,7 +256,7 @@ ARRAY_DEF(m_array_index, m_indexhash_t, M_POD_OPLIST)
   } while (0)
 
 
-/* Define the structure of a chained dictionary for all kind of dictionaries
+/* Define the structure of a dictionary for map and set
  * name: prefix of the container,
  * key_type: type of the key
  * key_oplist: oplist of the key
@@ -310,7 +309,7 @@ ARRAY_DEF(m_array_index, m_indexhash_t, M_POD_OPLIST)
   typedef key_type M_F(name, _key_ct);                                        \
   typedef value_type M_F(name, _value_ct);                                    \
   typedef dict_it_t M_F(name, _it_ct);                                        \
-  typedef m_index_t M_F(name, _index_ct); \
+  typedef m_index_t M_F(name, _index_ct);                                     \
                                                                               \
   M_INLINE void                                                               \
   M_C3(m_d1ct_,name,_update_limit)(dict_t map, m_index_t size)                \
@@ -328,7 +327,7 @@ ARRAY_DEF(m_array_index, m_indexhash_t, M_POD_OPLIST)
     map->count_delete = 0;                                                    \
     M_C3(m_d1ct_,name,_update_limit)(map, M_D1CT_INITIAL_SIZE);               \
     /* The first 2 buckets are reserved for (empty) and (deleted) access. Allocation could be avoided */ \
-    map->data = M_CALL_REALLOC(key_oplist, M_F(name, _freelist_ct), NULL, (size_t)(2+M_D1CT_INITIAL_SIZE)); \
+    map->data = M_CALL_REALLOC(key_oplist, M_F(name, _freelist_ct), NULL, (size_t) 1+2+map->upper_limit); \
     if (M_UNLIKELY_NOMEM (map->data == NULL)) {                               \
       M_MEMORY_FULL( (2+M_D1CT_INITIAL_SIZE) * sizeof (M_F(name, _freelist_ct))); \
       return ;                                                                \
@@ -407,6 +406,7 @@ ARRAY_DEF(m_array_index, m_indexhash_t, M_POD_OPLIST)
       map->freelist_first_data = map->data[d].freelist;                       \
       return d;                                                               \
     }                                                                         \
+    M_ASSERT(map->freelist_count <= 2+map->upper_limit);                      \
     return map->freelist_count++;                                             \
   }                                                                           \
                                                                               \
@@ -449,14 +449,19 @@ ARRAY_DEF(m_array_index, m_indexhash_t, M_POD_OPLIST)
     M_ASSERT (newSize >= oldSize);                                            \
     M_ASSERT (M_POWEROF2_P(newSize));                                         \
                                                                               \
+    if (updateLimit == true) {                                                \
+      M_C3(m_d1ct_,name,_update_limit)(h, newSize);                           \
+    }                                                                         \
     /* resize can be called just to delete the items */                       \
     if (newSize > oldSize) {                                                  \
       /* h->data is not always the same size than h->index: it may be bigger  \
          if there is some erase of items: h->index will shrink, but not h->data \
          To have an estimate of the size, we look at the maximum index of it: \
          if it is bigger than our new size, then we don't need to reallocate */ \
-      if (newSize > h->freelist_count) {                                      \
-        h->data = M_CALL_REALLOC(key_oplist, M_F(name, _freelist_ct), h->data, (size_t) 2+newSize); \
+      /* We need to allocate '2' for the dummy first two entries in the table (not used), \
+         then we can have at maximum only up to 'upper_limit+1' data */       \
+      if (1+2+h->upper_limit > h->freelist_count) {                           \
+        h->data = M_CALL_REALLOC(key_oplist, M_F(name, _freelist_ct), h->data, (size_t) 1+2+h->upper_limit); \
         if (M_UNLIKELY_NOMEM (h->data == NULL) ) {                            \
           M_MEMORY_FULL((2+newSize)*sizeof (M_F(name, _freelist_ct)));        \
           return ;                                                            \
@@ -521,9 +526,6 @@ ARRAY_DEF(m_array_index, m_indexhash_t, M_POD_OPLIST)
     m_array_index_clear(tmp);                                                 \
     h->mask = newSize-1;                                                      \
     h->count_delete = h->count;                                               \
-    if (updateLimit == true) {                                                \
-      M_C3(m_d1ct_,name,_update_limit)(h, newSize);                           \
-    }                                                                         \
     M_IF_DEBUG(  M_C3(m_d1ct_,name,_control_after_resize)(h);  )              \
   }                                                                           \
                                                                               \
@@ -607,6 +609,7 @@ ARRAY_DEF(m_array_index, m_indexhash_t, M_POD_OPLIST)
                                                                               \
     if (M_UNLIKELY (hash == map->index[p].hash)) {                            \
       m_index_t d = map->index[p].index;                                      \
+      M_ASSERT(d <= map->freelist_count);                                     \
       if (d >= 2 && M_CALL_EQUAL(key_oplist, map->data[d].pair.key, key)) {   \
         M_CALL_SET(value_oplist, map->data[d].pair.value, value);             \
         return;                                                               \
@@ -622,6 +625,7 @@ ARRAY_DEF(m_array_index, m_indexhash_t, M_POD_OPLIST)
         p = (p + M_D1CT_OA_PROBING(s)) & mask;                                \
         if (hash == (map->index[p].hash)) {                                   \
           m_index_t d = map->index[p].index;                                  \
+          M_ASSERT(d <= map->freelist_count);                                 \
           if (d >= 2 && M_CALL_EQUAL(key_oplist, map->data[d].pair.key, key)) { \
             M_CALL_SET(value_oplist, map->data[d].pair.value, value);         \
             return;                                                           \
@@ -666,6 +670,7 @@ ARRAY_DEF(m_array_index, m_indexhash_t, M_POD_OPLIST)
                                                                               \
     if (M_UNLIKELY (hash == map->index[p].hash)) {                            \
       m_index_t d = map->index[p].index;                                      \
+      M_ASSERT(d <= map->freelist_count);                                     \
       if (d >= 2 && M_CALL_EQUAL(key_oplist, map->data[d].pair.key, key)) {   \
         return & map->data[d].pair.M_IF(isSet)(key, value);                   \
       }                                                                       \
@@ -680,6 +685,7 @@ ARRAY_DEF(m_array_index, m_indexhash_t, M_POD_OPLIST)
         p = (p + M_D1CT_OA_PROBING(s)) & mask;                                \
         if (hash == (map->index[p].hash)) {                                   \
           m_index_t d = map->index[p].index;                                  \
+          M_ASSERT(d <= map->freelist_count);                                 \
           if (d >= 2 && M_CALL_EQUAL(key_oplist, map->data[d].pair.key, key)) { \
             return & map->data[d].pair.M_IF(isSet)(key, value);               \
           }                                                                   \
@@ -728,6 +734,7 @@ ARRAY_DEF(m_array_index, m_indexhash_t, M_POD_OPLIST)
     while (true) {                                                            \
       if (M_LIKELY (hash == map->index[p].hash)) {                            \
         m_index_t d = map->index[p].index;                                    \
+        M_ASSERT(d <= map->freelist_count);                                   \
         if (d >= 2 && M_CALL_EQUAL(key_oplist, map->data[d].pair.key, key)) { \
           break;                                                              \
         }                                                                     \
@@ -738,6 +745,7 @@ ARRAY_DEF(m_array_index, m_indexhash_t, M_POD_OPLIST)
       M_ASSERT (s <= map->mask);                                              \
     }                                                                         \
     const m_index_t d = map->index[p].index;                                  \
+    M_ASSERT(d <= map->freelist_count);                                       \
     M_CALL_CLEAR(key_oplist, map->data[d].pair.key);                          \
     M_CALL_CLEAR(value_oplist, map->data[d].pair.value);                      \
     M_C3(m_d1ct_,name,_release_bucket)(map, d);                               \
@@ -1457,7 +1465,7 @@ enum m_d1ct_oa_element_e {
   typedef key_type M_F(name, _key_ct);                                        \
   typedef value_type M_F(name, _value_ct);                                    \
   typedef dict_it_t M_F(name, _it_ct);                                        \
-  typedef size_t M_F(name, _index_ct); \
+  typedef size_t M_F(name, _index_ct);                                        \
                                                                               \
   M_INLINE void                                                               \
   M_C3(m_d1ct_,name,_update_limit)(dict_t dict, size_t size)                  \
@@ -1505,7 +1513,7 @@ enum m_d1ct_oa_element_e {
     dict->data = NULL;                                                        \
   }                                                                           \
                                                                               \
-  M_INLINE value_type *                                                       \
+  M_INLINE value_type * M_ATTR_HOT_FUNCTION                                   \
   M_F(name, _get)(const dict_t dict, key_type const key)                      \
   {                                                                           \
     M_D1CT_OA_CONTRACT(dict);                                                 \
@@ -1547,7 +1555,7 @@ enum m_d1ct_oa_element_e {
   }                                                                           \
   )                                                                           \
                                                                               \
-  M_INLINE void                                                               \
+  M_INLINE void M_ATTR_COLD_FUNCTION                                          \
   M_C3(m_d1ct_,name,_resize_up)(dict_t h, size_t newSize, bool updateLimit)   \
   {                                                                           \
     size_t oldSize = h->mask+1;                                               \
@@ -1563,17 +1571,29 @@ enum m_d1ct_oa_element_e {
       }                                                                       \
                                                                               \
       /* First mark the extended space as empty */                            \
-      for(size_t i = oldSize ; i < newSize; i++)                              \
-        M_CALL_OOR_SET(key_oplist, data[i].key, M_D1CT_OA_EMPTY);             \
+      M_ASSUME( oldSize + 8 < newSize);                                       \
+      for(size_t i = oldSize ; i < newSize; i+=8) {                           \
+        /* Unroll loop as compiler doesn't do it by itself */                 \
+        M_CALL_OOR_SET(key_oplist, data[i+0].key, M_D1CT_OA_EMPTY);           \
+        M_CALL_OOR_SET(key_oplist, data[i+1].key, M_D1CT_OA_EMPTY);           \
+        M_CALL_OOR_SET(key_oplist, data[i+2].key, M_D1CT_OA_EMPTY);           \
+        M_CALL_OOR_SET(key_oplist, data[i+3].key, M_D1CT_OA_EMPTY);           \
+        M_CALL_OOR_SET(key_oplist, data[i+4].key, M_D1CT_OA_EMPTY);           \
+        M_CALL_OOR_SET(key_oplist, data[i+5].key, M_D1CT_OA_EMPTY);           \
+        M_CALL_OOR_SET(key_oplist, data[i+6].key, M_D1CT_OA_EMPTY);           \
+        M_CALL_OOR_SET(key_oplist, data[i+7].key, M_D1CT_OA_EMPTY);           \
+      }                                                                       \
     }                                                                         \
                                                                               \
     /* Then let's rehash all the entries in their **exact** position.         \
        If we can't, let's put them in the 'tmp' array.                        \
        It has been measured that the size of this 'tmp' array is              \
        around 6% of the size of updated dictionary.                           \
-       NOTE: This should be much cache friendly than typical hash code  */    \
+       NOTE: This should be much cache friendly than typical hash code        \
+       Reserve a little bit of array to avoid reallocation if possible */     \
     M_F(name, _array_pair_ct) tmp;                                            \
     M_F(name, _array_pair_init)(tmp);                                         \
+    M_F(name, _array_pair_reserve)(tmp, oldSize >> 2);                        \
     const size_t mask = (newSize -1);                                         \
                                                                               \
     for(size_t i = 0 ; i < oldSize; i++) {                                    \
@@ -1603,13 +1623,12 @@ enum m_d1ct_oa_element_e {
     while (M_F(name, _array_pair_size)(tmp) > 0) {                            \
       M_F(name, _pair_ct) const *item = M_F(name, _array_pair_back)(tmp);     \
       size_t p = M_CALL_HASH(key_oplist, item->key) & mask;                   \
+      size_t s = 1;                                                           \
       /* NOTE: since the first pass, the bucket might be free now */          \
-      if (!M_CALL_OOR_EQUAL(key_oplist, data[p].key, M_D1CT_OA_EMPTY)) {      \
-        size_t s = 1;                                                         \
-        do {                                                                  \
-          p = (p + M_D1CT_OA_PROBING(s)) & mask;                              \
-          M_ASSERT (s <= h->mask);                                            \
-        } while (!M_CALL_OOR_EQUAL(key_oplist, data[p].key, M_D1CT_OA_EMPTY) ); \
+      /* Likely cache miss */                                                 \
+      while (!M_CALL_OOR_EQUAL(key_oplist, data[p].key, M_D1CT_OA_EMPTY)) {   \
+        p = (p + M_D1CT_OA_PROBING(s)) & mask;                                \
+        M_ASSERT (s <= h->mask);                                              \
       }                                                                       \
       M_F(name, _array_pair_pop_move)(&data[p], tmp);                         \
     }                                                                         \
@@ -1625,7 +1644,7 @@ enum m_d1ct_oa_element_e {
     M_D1CT_OA_CONTRACT(h);                                                    \
   }                                                                           \
                                                                               \
-  M_INLINE void                                                               \
+  M_INLINE void M_ATTR_HOT_FUNCTION                                           \
   M_IF(isSet)(M_F(name, _push), M_F(name,_set_at))                            \
        (dict_t dict, key_type const key                                       \
         M_IF(isSet)(, M_DEFERRED_COMMA value_type const value) )              \
@@ -1685,7 +1704,7 @@ enum m_d1ct_oa_element_e {
     M_D1CT_OA_CONTRACT(dict);                                                 \
   }                                                                           \
                                                                               \
-  M_INLINE value_type *                                                       \
+  M_INLINE value_type * M_ATTR_HOT_FUNCTION                                   \
   M_F(name,_safe_get)(dict_t dict, key_type const key)                        \
   {                                                                           \
     M_D1CT_OA_CONTRACT(dict);                                                 \
@@ -1747,7 +1766,7 @@ enum m_d1ct_oa_element_e {
     return M_F(name,_safe_get)(dict, key);                                    \
   }                                                                           \
                                                                               \
-  M_INLINE void                                                               \
+  M_INLINE void M_ATTR_COLD_FUNCTION                                          \
   M_C3(m_d1ct_,name,_resize_down)(dict_t h, size_t newSize)                   \
   {                                                                           \
     size_t oldSize = h->mask+1;                                               \
@@ -2002,8 +2021,173 @@ enum m_d1ct_oa_element_e {
     return M_CONST_CAST(it_deref_t, M_F(name, _ref)(it));                     \
   }                                                                           \
                                                                               \
-  M_D1CT_FUNC_ADDITIONAL_DEF2(name, key_type, key_oplist, value_type, value_oplist, isSet, dict_t, dict_it_t, it_deref_t)
+  M_D1CT_FUNC_ADDITIONAL_DEF2(name, key_type, key_oplist, value_type, value_oplist, isSet, dict_t, dict_it_t, it_deref_t) \
+  M_IF(isSet)(M_EAT, M_D1CT_OA_DEF_BULK)(name, key_type, key_oplist, value_type, value_oplist, isSet, coeff_down, coeff_up, dict_t, dict_it_t, it_deref_t)
 
+
+// Number of loads to perform in advance
+#ifndef M_USE_MAX_PREFETCH
+#define M_USE_MAX_PREFETCH 16
+#endif
+
+// WIP. Only if isSet is true for the time being
+#define M_D1CT_OA_DEF_BULK(name, key_type, key_oplist, value_type, value_oplist, isSet, coeff_down, coeff_up, dict_t, dict_it_t, it_deref_t) \
+                                                                              \
+M_INLINE void                                                                 \
+M_F(name, _bulk_get)(unsigned n, value_type val[M_VLA(n)], dict_t dict, key_type const key[M_VLA(n)], value_type def) \
+{                                                                             \
+  M_D1CT_OA_CONTRACT (dict);                                                  \
+  size_t h[M_USE_MAX_PREFETCH];                                               \
+  M_F(name, _pair_ct) *data = dict->data;                                     \
+  const size_t mask = dict->mask;                                             \
+  const unsigned num = M_MIN(M_USE_MAX_PREFETCH, n);                          \
+  for(unsigned i = 0 ; i < num; i++) {                                        \
+    h[i] = M_CALL_HASH(key_oplist, key[i]) & mask;                            \
+    M_PREFETCH(&data[h[i]]);                                                  \
+  }                                                                           \
+  for (unsigned i = 0; i < n; i++) {                                          \
+    size_t s = 1, p = h[i % M_USE_MAX_PREFETCH];                              \
+    if (i+M_USE_MAX_PREFETCH < n) {                                           \
+      h[i % M_USE_MAX_PREFETCH] = M_CALL_HASH(key_oplist, key[i+M_USE_MAX_PREFETCH]) & mask; \
+      M_PREFETCH(&data[h[i % M_USE_MAX_PREFETCH]]);                           \
+    }                                                                         \
+    while (true) {                                                            \
+      if (M_LIKELY (M_CALL_EQUAL(key_oplist, data[p].key, key[i]))) {         \
+        M_CALL_SET(value_oplist, val[i], data[p].value);                      \
+        break;                                                                \
+      }                                                                       \
+      if (M_LIKELY (M_CALL_OOR_EQUAL (key_oplist, data[p].key, M_D1CT_OA_EMPTY)) ) { \
+        M_CALL_SET(value_oplist, val[i], def);                                \
+        break;                                                                \
+      }                                                                       \
+      p = (p + M_D1CT_OA_PROBING(s)) & mask;                                  \
+      M_ASSERT(p <= mask);                                                    \
+    }                                                                         \
+  }                                                                           \
+}                                                                             \
+                                                                              \
+M_INLINE void                                                                 \
+M_F(name, _bulk_set)(dict_t dict, unsigned n, value_type const val[M_VLA(n)], key_type const key[M_VLA(n)]) \
+{                                                                             \
+  M_D1CT_OA_CONTRACT (dict);                                                  \
+  size_t h[M_USE_MAX_PREFETCH];                                               \
+  const unsigned num = M_MIN(M_USE_MAX_PREFETCH, n);                          \
+  for(unsigned i = 0 ; i < num; i++) {                                        \
+    h[i] = M_CALL_HASH(key_oplist, key[i]);                                   \
+    M_PREFETCH(&dict->data[h[i] & dict->mask]);                               \
+  }                                                                           \
+                                                                              \
+  for (unsigned i = 0; i < n; i++) {                                          \
+    size_t p = h[i % M_USE_MAX_PREFETCH] & dict->mask;                        \
+    if (i+M_USE_MAX_PREFETCH < n) {                                           \
+      h[i % M_USE_MAX_PREFETCH] = M_CALL_HASH(key_oplist, key[i+M_USE_MAX_PREFETCH]); \
+      M_PREFETCH(&dict->data[h[i % M_USE_MAX_PREFETCH] & dict->mask]);        \
+    }                                                                         \
+    if (M_UNLIKELY (M_CALL_EQUAL(key_oplist, dict->data[p].key, key[i]))) {   \
+      M_CALL_SET(value_oplist, dict->data[p].value, val[i]);                  \
+      continue;                                                               \
+    }                                                                         \
+    /* Search loop for insertion */                                           \
+    size_t s = 1;                                                             \
+    size_t delPos = SIZE_MAX;                                                 \
+    while (M_UNLIKELY (!M_CALL_OOR_EQUAL (key_oplist, dict->data[p].key, M_D1CT_OA_EMPTY)) ) { \
+      if (M_CALL_EQUAL(key_oplist,  dict->data[p].key, key[i])) {             \
+        M_CALL_SET(value_oplist, dict->data[p].value, val[i]);                \
+        goto next;                                                            \
+      }                                                                       \
+      if (M_CALL_OOR_EQUAL (key_oplist, dict->data[p].key, M_D1CT_OA_DELETED) \
+          && (delPos == SIZE_MAX))                                            \
+        delPos = p;                                                           \
+      p = (p + M_D1CT_OA_PROBING(s)) & dict->mask;                            \
+    }                                                                         \
+    /* Add new item */                                                        \
+    if (delPos != SIZE_MAX) {                                                 \
+      p = delPos;                                                             \
+      dict->count_delete --;                                                  \
+    }                                                                         \
+    M_CALL_INIT_SET(key_oplist, dict->data[p].key, key[i]);                   \
+    M_CALL_INIT_SET(value_oplist, dict->data[p].value, val[i]);               \
+    dict->count++;                                                            \
+    dict->count_delete ++;                                                    \
+                                                                              \
+    if (M_UNLIKELY (dict->count_delete >= dict->upper_limit)) {               \
+      size_t newSize = dict->mask+1;                                          \
+      if (dict->count > (dict->mask / 2)) {                                   \
+        newSize += newSize;                                                   \
+        if (M_UNLIKELY_NOMEM (newSize <= dict->mask+1)) {                     \
+          M_MEMORY_FULL((size_t)-1);                                          \
+        }                                                                     \
+      }                                                                       \
+      M_C3(m_d1ct_,name,_resize_up)(dict, newSize, true);                     \
+    }                                                                         \
+  next:                                                                       \
+    (void)0;                                                                  \
+  }                                                                           \
+  M_D1CT_OA_CONTRACT (dict);                                                  \
+}                                                                             \
+                                                                              \
+                                                                              \
+M_INLINE void                                                                 \
+M_F(name, _bulk_update)(dict_t dict, unsigned n, value_type val[M_VLA(n)], key_type const key[M_VLA(n)], value_type def, \
+                        void (*update)(dict_t dict, key_type const key, value_type *storeval, value_type *newval)) \
+{                                                                             \
+  M_D1CT_OA_CONTRACT (dict);                                                  \
+  size_t h[M_USE_MAX_PREFETCH];                                               \
+  const unsigned num = M_MIN(M_USE_MAX_PREFETCH, n);                          \
+  for(unsigned i = 0 ; i < num; i++) {                                        \
+    h[i] = M_CALL_HASH(key_oplist, key[i]);                                   \
+    M_PREFETCH(&dict->data[h[i] & dict->mask]);                               \
+  }                                                                           \
+                                                                              \
+  for (unsigned i = 0; i < n; i++) {                                          \
+    size_t p = h[i % M_USE_MAX_PREFETCH] & dict->mask;                        \
+    if (i+M_USE_MAX_PREFETCH < n) {                                           \
+      h[i % M_USE_MAX_PREFETCH] = M_CALL_HASH(key_oplist, key[i+M_USE_MAX_PREFETCH]); \
+      M_PREFETCH(&dict->data[h[i % M_USE_MAX_PREFETCH] & dict->mask]);        \
+    }                                                                         \
+    if (M_UNLIKELY (M_CALL_EQUAL(key_oplist, dict->data[p].key, key[i]))) {   \
+      update (dict, key[i], &dict->data[p].value, &val[i]);                   \
+      continue;                                                               \
+    }                                                                         \
+    /* Search loop for insertion */                                           \
+    size_t s = 1;                                                             \
+    size_t delPos = SIZE_MAX;                                                 \
+    while (M_UNLIKELY (!M_CALL_OOR_EQUAL (key_oplist, dict->data[p].key, M_D1CT_OA_EMPTY)) ) { \
+      if (M_CALL_EQUAL(key_oplist,  dict->data[p].key, key[i])) {             \
+      update (dict, key[i], &dict->data[p].value, &val[i]);                   \
+        goto next;                                                            \
+      }                                                                       \
+      if (M_CALL_OOR_EQUAL (key_oplist, dict->data[p].key, M_D1CT_OA_DELETED) \
+          && (delPos == SIZE_MAX))                                            \
+        delPos = p;                                                           \
+      p = (p + M_D1CT_OA_PROBING(s)) & dict->mask;                            \
+    }                                                                         \
+    /* Add new item */                                                        \
+    if (delPos != SIZE_MAX) {                                                 \
+      p = delPos;                                                             \
+      dict->count_delete --;                                                  \
+    }                                                                         \
+    M_CALL_INIT_SET(key_oplist, dict->data[p].key, key[i]);                   \
+    M_CALL_INIT_SET(value_oplist, dict->data[p].value, def);                  \
+    update (dict, key[i], &dict->data[p].value, &val[i]);                     \
+    dict->count++;                                                            \
+    dict->count_delete ++;                                                    \
+                                                                              \
+    if (M_UNLIKELY (dict->count_delete >= dict->upper_limit)) {               \
+      size_t newSize = dict->mask+1;                                          \
+      if (dict->count > (dict->mask / 2)) {                                   \
+        newSize += newSize;                                                   \
+        if (M_UNLIKELY_NOMEM (newSize <= dict->mask+1)) {                     \
+          M_MEMORY_FULL((size_t)-1);                                          \
+        }                                                                     \
+      }                                                                       \
+      M_C3(m_d1ct_,name,_resize_up)(dict, newSize, true);                     \
+    }                                                                         \
+  next:                                                                       \
+    (void)0;                                                                  \
+  }                                                                           \
+  M_D1CT_OA_CONTRACT (dict);                                                  \
+}                                                                             \
 
 /******************************** INTERNAL ***********************************/
 

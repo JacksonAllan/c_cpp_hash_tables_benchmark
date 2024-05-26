@@ -143,9 +143,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
 * [<span class="table_label">emilib2::HashMap</span>](https://github.com/ktprime/emhash/tree/master/thirdparty/emilib):
 
-  This table is yet another open-addressing table that uses SIMD instructions to scan multiple hash-code fragments at once for potential key matches. The library is still under development, and details about its implementation are sparse and liable to change. However, one distinguishing quality is that it uses an extra byte per bucket to store the displacement of the farthest key-value pair that hashed to that bucket, which allows early termination of probing during lookups of nonexisting keys. It relies on tombstones for erasure.
-
-  This table's approximate memory overhead is two bytes, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
+  This table is yet another open-addressing table that uses SIMD instructions to scan multiple hash-code fragments at once for potential key matches. The library is still under development, and details about its implementation are sparse and liable to change. Its approximate memory overhead is 1.25 bytes, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
   The version benchmarked is [emilib2o.hpp](https://github.com/ktprime/emhash/blob/434a20571a8d6b83b308ee0655a7076b5177e1fc/thirdparty/emilib/emilib2o.hpp) `434a205`, which I modified to set the maximum load factor to 0.875.
 
@@ -189,15 +187,15 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   Note that <span class="table_label">klib</span> also includes a newer hash-table that is called <span class="table_label">khashl</span> and uses linear probing without tombstones. This table is not included in these benchmarks.
 
-* <span class="table_label">DICT</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) <mark>v????</mark>:
+* <span class="table_label">DICT</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) v0.7.3:
 
-  This is another open-addressing table that uses quadratic probing by default. Like <span class="table_label">ankerl::unordered_dense</span>, it stores key-value pairs in an array seperate from the buckets array. The buckets array stores indices into the key-value pairs array, along with hash codes. Unlike <span class="table_label">ankerl::unordered_dense</span>, the table does not necessarily store key-value pairs contiguously because it relies on tombstones for erasure.
+  This is another open-addressing table that uses quadratic probing by default. Like <span class="table_label">ankerl::unordered_dense</span> and <span class="table_label">stb_ds</span>'s <span class="table_label">hm</span> and <span class="table_label">sh</span>, it stores key-value pairs in an array seperate from the buckets array. The buckets array stores indices into the key-value pairs array, along with hash codes. Unlike those two other tables, it does not store key-value pairs contiguously. This is because when erasing, it does not move the last key-value pair in the array backward to fill the gap created (a process that requires another lookup to update the index of the moved pair stored in the buckets array).
 
   This table, too, can only accomodate 2<sup>32</sup> key-value pairs by default, and enabling support for a higher number impacts memory usage and cache efficiency. For these benchmarks, I used the default limit.
 
-  This table's approximate memory overhead is eight bytes (or 16 bytes, for tables that can accommodate more than 2<sup>32</sup> key-value pairs), plus pointer-key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
+  This table's approximate memory overhead is eight bytes (or 16 bytes, for tables that can accommodate more than 2<sup>32</sup> key-value pairs), plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
-* <span class="table_label">DICT_OA</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) <mark>v????</mark>:
+* <span class="table_label">DICT_OA</span> from [<span class="table_label">M\*LIB</span>](https://github.com/P-p-H-d/mlib) v0.7.3:
 
   Like <span class="table_label">DICT</span>, <span class="table_label">DICT_OA</span> is an open-addressing table using quadratic probing by default. However, it is more conventional in that it stores keys and values together inside the hash-table buckets. Its standout feature is that instead of storing per-bucket metadata, it requires users to reserve two keys to mark empty buckets and tombstones. Hence, the table can often store data more densely and, therefore, in a more cache-friendly manner. For the benchmarks involving integer keys, I have opted to reserve two integer values to act as these sentinels (rather than manually coupling each key with an extra flag) in order to allow the table to take advantage of this feature. However, when configured thusly, this table cannot technically accommodate the full range of keys that the other tables can accommodate.
 
@@ -13660,7 +13658,7 @@ The following section contains my analysis of the results, especially the 0-to-2
 
 * <span class="table_label">boost::unordered_flat_map</span>: This table has very fast insertions and erasures of existing keys (although, as previously mentioned, erasures leave a residual impact via the "overflow byte" mechanism). For looking up and erasing nonexisting keys, its performance is among the fastest tables tested. It is rather fast for looking up existing integer keys (but not the top contender, especially for large buckets). It is also very fast for looking up string keys. Its iteration speed is also excellent thanks to the clustering of key-value pairs within each bucket group, with only by the tables that store key-value pairs contiguously being significantly faster. This table's edge over most of the other tables is notably larger in the low-key-count (0 to 200,000 keys) benchmarks, which suggests that it benefits from being in the cache more than the other tables do.
 
-* <span class="table_label">emilib2::HashMap</span>: This table's performance is very close to <span class="table_label">boost::unordered_flat_map</span>'s performance in most benchmarks. The most significant difference is that lookups and erasures of nonexisting keys are considerably slower. This suggests that <span class="table_label">boost::unordered_flat_map</span>'s "overflow byte" mechanism may be more effective than storing the distance between each bucket and the farthest key-value pair that hashed to it when it comes to terminating unsuccessful lookups early. Like <span class="table_label">boost::unordered_flat_map</span>, this table's speed relative to the other tables is at its fastest in the low-key-count benchmarks.
+* <span class="table_label">emilib2::HashMap</span>: This table's performance is very close to <span class="table_label">boost::unordered_flat_map</span>'s performance in most benchmarks. The most significant difference is that lookups and erasures of nonexisting keys are considerably slower. Like <span class="table_label">boost::unordered_flat_map</span>, this table's speed relative to the other tables is at its fastest in the low-key-count benchmarks.
 
 * <span class="table_label">ska::bytell_hash_map</span>: This table's lookups are relatively fast when it comes to integer keys (but not as competitive when it comes to string keys, probably due to the absence of a mechanism to limit key comparisons based on hash-code fragments). Its erasure of existing keys is also fast (albeit not as fast as the top contenders). However, its insertions are slow. Its iteration is also curiously slow even though it uses a separate array of metadata. The other tables tested that use a similar mechanism—including <span class="table_label">Verstable</span>, which must iterate over twice as much metadata—display significantly faster iteration. Moreover, how this table's reliance on an array of "jump distances" affects real-world performance when enough other work is being done between hash-table operations to flush it out of the cache remains an open question.
 
@@ -13674,7 +13672,7 @@ The following section contains my analysis of the results, especially the 0-to-2
 
 * <span class="table_label">khash</span> from <span class="table_label">klib</span>: This table has reasonably good insertion speed, particularly for integer keys. Its erasure of existing keys is fast (but relies on tombstones). However, its lookups of existing keys are relatively slow, as are its lookups and erasures of nonexisting keys. Its iteration is also slow for an open-addressing table.
 
-* <span class="table_label">DICT</span> from <span class="table_label">M\*LIB</span>: This table has fast insertions (especially for string keys and large buckets) and extremely fast lookups of existing keys. It is similarly fast for erasing existing keys (although it relies on tombstones). However, it is rather slow for looking up or erasing nonexisting keys. Its iteration is also 2-3x slower than the slowest among the other open-addressing table, despite the storage of key-value pairs in a separate array.
+* <span class="table_label">DICT</span> from <span class="table_label">M\*LIB</span>: This table has fast insertions (especially for string keys and large buckets) and extremely fast lookups of existing keys. It is similarly fast for erasing existing keys (although it relies on tombstones). However, it is rather slow for looking up or erasing nonexisting keys. Its iteration is also 2-3x slower than the slowest among the other open-addressing table, despite the storage of key-value pairs in a separate array. This is because the potential presence of gaps in the key-value-pairs array precludes iterating over it directly and without reference to the buckets array, which stores eight to 16 bytes per bucket.
 
 * <span class="table_label">DICT_OA</span> from <span class="table_label">M\*LIB</span>: This table has very fast lookups of integer keys—the fastest among all the tables in the 0-to-20,000,00-key benchmarks when the buckets are small. In this regard, the table is probably benefiting from the better cache performance that results from the choice to have users reserve sentinel values instead of storing metadata. However, it is relatively slow for looking up or erasing nonexisting keys, and its insertion and iteration speed is average. Its erasures of integer keys are very fast but rely on tombstones.
 
@@ -13706,7 +13704,7 @@ The above conclusion may leave readers wondering about the differences between <
 
 ## Acknowledgements
 
-I would like to thank [Joaquín M López Muñoz](https://github.com/joaquintides), [Martin Leitner-Ankerl](https://github.com/martinus), and GitHub users [attractivechaos](https://github.com/attractivechaos) and [P-p-H-d](https://github.com/P-p-H-d) for their valuable feedback during the drafting of this article.
+I would like to thank [Joaquín M López Muñoz](https://github.com/joaquintides), [Martin Leitner-Ankerl](https://github.com/martinus), [Patrick Pelissier](https://github.com/P-p-H-d), and [attractivechaos](https://github.com/attractivechaos) for their valuable feedback during the drafting of this article.
 
 ## Discussion
 
