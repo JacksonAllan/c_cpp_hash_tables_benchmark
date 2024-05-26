@@ -1,7 +1,8 @@
 <style>
 .table_label
 {
-  font-weight: 500;
+  /*font-weight: 500;*/
+  color: darkred;
 }
 
 .boost_absl_diagram td
@@ -13666,7 +13667,7 @@ The following section contains my analysis of the results, especially the 0-to-2
 
 * <span class="table_label">tsl::robin_map</span>: This table is fast for inserting string keys. However, its performance in most of the other benchmarks ranges from average to slow and is highly dependent on the load factor. Of course, this table would be much more competitive were its maximum load factor kept at its very low default of 0.5.
 
-* <span class="table_label">cc_map</span> from <span class="table_label">CC</span>: _Disclaimer: I am the author of this table_. Since <span class="table_label">CC</span> implements the same hash-table design as <span class="table_label">Verstable</span>, its results are similar to <span class="table_label">Verstabe</span>'s results, and the same [comments](#verstable_analysis) apply. However, its iteration—though fast—is somewhat slower than <span class="table_label">Verstable</span>'s iteration. This is because iterators in <span class="table_label">CC</span> are raw pointers to buckets, rather than a struct containing both a pointer to a bucket and a pointer to its corresponding metadata. Hence, <span class="table_label">cc_map</span> must perform an extra calculation per iteration to locate the current bucket's metadata.
+* <span class="table_label">cc_map</span> from <span class="table_label">CC</span>: _Disclaimer: I am the author of this table_. Since <span class="table_label">CC</span> implements the same hash-table design as <span class="table_label">Verstable</span>, its results are similar to <span class="table_label">Verstable</span>'s results, and the same [comments](#verstable_analysis) apply. However, its iteration—though fast—is somewhat slower than <span class="table_label">Verstable</span>'s iteration. This is because iterators in <span class="table_label">CC</span> are raw pointers to buckets, rather than a struct containing both a pointer to a bucket and a pointer to its corresponding metadata. Hence, <span class="table_label">cc_map</span> must perform an extra calculation per iteration to locate the current bucket's metadata.
 
 * <span class="table_label">hmap</span> from <span class="table_label">STC</span>: This table has very fast insertions of integer keys, irrespective of bucket size. It is also rather fast for looking up existing keys, and its iteration performance is on the faster side of average. However, it is relatively slow on lookups and erasures of nonexisting keys. Its erasure of existing keys is also rather slow for integer keys and extremely slow for string keys. This is due to the backward-shifting erasure mechanism. While this mechanism eliminates the need for tombstones, it necessitates both moving many key-value pairs and rehashing every key that may need to be moved to determine the bucket to which it originally hashed (this problem does not exist for Robin Hood tables, which must store displacements, ideal bucket indices, or hash codes). Hence, when erasures are frequent and the hash function is expensive, I recommend that users manually calculate and store each key's hash code as part of a struct and supply the table with a hash function that simply returns the pre-calculated hash code.
 
