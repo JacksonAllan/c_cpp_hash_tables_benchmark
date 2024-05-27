@@ -13704,7 +13704,7 @@ The above conclusion may leave readers wondering about the differences between <
 
 ## Acknowledgements
 
-I would like to thank [Joaquín M López Muñoz](https://github.com/joaquintides), [Martin Leitner-Ankerl](https://github.com/martinus), [Patrick Pelissier](https://github.com/P-p-H-d), and [attractivechaos](https://github.com/attractivechaos) for their valuable feedback during the drafting of this article.
+I would like to thank [Joaquín M López Muñoz](https://github.com/joaquintides), [Martin Leitner-Ankerl](https://github.com/martinus), [Patrick Pelissier](https://github.com/P-p-H-d), and [Attractive Chaos](https://github.com/attractivechaos) for their valuable feedback during the drafting of this article.
 
 ## Discussion
 
