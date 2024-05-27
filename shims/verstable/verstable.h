@@ -382,7 +382,9 @@ API:
 
 Version history:
 
-  14/03/2024 2.1.0: Replaced the Murmur3 mixer with the fast-hash mixer as the default integer hash function.
+  27/05/2024 2.1.0: Replaced the Murmur3 mixer with the fast-hash mixer as the default integer hash function.
+                    Fixed a bug that could theoretically cause a crash on rehash (triggerable in testing using
+                    NAME_shrink with a maximum load factor significantly higher than 1.0).
   06/02/2024 2.0.0: Improved custom allocator support by introducing the CTX_TY option and allowing user-supplied free
                     functions to receive the allocation size.
                     Improved documentation.
@@ -472,7 +474,7 @@ static inline size_t vt_quadratic( uint16_t displacement )
 static inline int vt_first_nonzero_uint16( uint64_t val )
 {
   const uint16_t endian_checker = 0x0001;
-  if( *(char *)&endian_checker ) // Little-endian (the compiler will optimize away the check at -O1 and above).
+  if( *(const char *)&endian_checker ) // Little-endian (the compiler will optimize away the check at -O1 and above).
     return __builtin_ctzll( val ) / 16;
   
   return __builtin_clzll( val ) / 16;
@@ -489,7 +491,7 @@ static inline int vt_first_nonzero_uint16( uint64_t val )
   unsigned long result;
 
   const uint16_t endian_checker = 0x0001;
-  if( *(char *)&endian_checker )
+  if( *(const char *)&endian_checker )
     _BitScanForward64( &result, val );
   else
     _BitScanReverse64( &result, val );
@@ -1299,19 +1301,23 @@ bool VT_CAT( NAME, _rehash )( NAME *table, size_t bucket_count )
         );
 
         if( VT_UNLIKELY( VT_CAT( NAME, _is_end )( itr ) ) )
-        {
-          FREE_FN(
-            new_table.buckets,
-            VT_CAT( NAME, _total_alloc_size )( &new_table )
-            #ifdef CTX_TY
-            , &new_table.ctx
-            #endif
-          );
-
-          bucket_count *= 2;
-          continue;
-        }
+          break;
       }
+
+    // If a key could not be reinserted due to the displacement limit, double the bucket count and retry.
+    if( VT_UNLIKELY( new_table.key_count < table->key_count ) )
+    {
+      FREE_FN(
+        new_table.buckets,
+        VT_CAT( NAME, _total_alloc_size )( &new_table )
+        #ifdef CTX_TY
+        , &new_table.ctx
+        #endif
+      );
+
+      bucket_count *= 2;
+      continue;
+    }
 
     if( table->buckets_mask )
       FREE_FN(
@@ -1452,7 +1458,7 @@ VT_API_FN_QUALIFIERS VT_CAT( NAME, _itr ) VT_CAT( NAME, _get )( NAME *table, KEY
 // This return value is necessary because at the iterator location, the erasure could result in an empty bucket, a
 // bucket containing a moved key already visited during the iteration, or a bucket containing a moved key not yet
 // visited.
-VT_API_FN_QUALIFIERS bool VT_CAT( NAME, _erase_itr_raw ) ( NAME *table, VT_CAT( NAME, _itr ) itr )
+VT_API_FN_QUALIFIERS bool VT_CAT( NAME, _erase_itr_raw )( NAME *table, VT_CAT( NAME, _itr ) itr )
 {
   --table->key_count;
   size_t itr_bucket = itr.metadatum - table->metadata;

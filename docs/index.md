@@ -169,7 +169,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
 ### C Tables
 
-* <span class="table_label">cc_map</span> from [<span class="table_label">CC</span>](https://github.com/JacksonAllan/CC) <mark>v????</mark>:
+* <span class="table_label">cc_map</span> from [<span class="table_label">CC</span>](https://github.com/JacksonAllan/CC) v1.1.1:
 
   This table implements <span class="table_label">Verstable</span> within the constraints of <span class="table_label">CC</span>'s API. See [below](#verstable_description) for more details.
 
@@ -241,7 +241,7 @@ typedef struct UT_hash_handle {
 </tr>
 </table>
 
-* <a name="verstable_description"></a>[<span class="table_label">Verstable</span>](https://github.com/JacksonAllan/Verstable) <mark>v????</mark>:
+* <a name="verstable_description"></a>[<span class="table_label">Verstable</span>](https://github.com/JacksonAllan/Verstable) v2.1.0:
 
   Like <span class="table_label">ska::bytell_hash_map</span>, this table is a hybrid of open addressing and separate chaining that stores keys overflowing from one bucket in otherwise vacant buckets of the flat buckets array. However, rather than chaining key-value pairs using a 7-bit index into an array of "jump distances", it does so using an 11-bit integer denoting quadratic displacement. It also stores a 4-bit fragment of each key's hash code to limit key comparisons. Hence, it uses two bytes of metadata per bucket, rather than the one byte used by <span class="table_label">ska::bytell_hash_map</span>. The metadata is stored in a separate array, rather than interspersed with groups of buckets.
 

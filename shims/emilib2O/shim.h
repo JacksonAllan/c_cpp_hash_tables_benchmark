@@ -90,7 +90,7 @@ template< typename blueprint > struct emilib2O
 
 template<> struct emilib2O< void >
 {
-  static constexpr const char *label = "emilib2o";
+  static constexpr const char *label = "emilib2";
   static constexpr const char *color = "rgb( 121, 199, 178 )";
   static constexpr bool tombstone_like_mechanism = true;
 };

@@ -1,4 +1,4 @@
-/*----------------------------------------- CC: CONVENIENT CONTAINERS v1.1.0 -------------------------------------------
+/*----------------------------------------- CC: CONVENIENT CONTAINERS v1.1.1 -------------------------------------------
 
 This library provides usability-oriented generic containers (vectors, linked lists, unordered maps, and unordered sets).
 
@@ -514,7 +514,9 @@ API:
 
 Version history:
 
-  14/03/2024 1.1.0: Replaced the Robin Hood implementations of map and set with Verstable implementations.
+  27/05/2024 1.1.1: Fixed a bug in map and set that could theoretically cause a crash on rehash (triggerable in testing
+                    using cc_shrink with a maximum load factor significantly higher than 1.0).
+  18/03/2024 1.1.0: Replaced the Robin Hood implementations of map and set with Verstable implementations.
                     Added branch-prediction optimizations.
                     Improved documentation.
   23/01/2024 1.0.4: Fixed critical bug causing undefined behavior upon iteration of empty maps with nonzero capacities.
@@ -1028,7 +1030,7 @@ cc_memcpy_and_return_ptr(                                                       
 static inline bool cc_is_little_endian( void )
 {
   const uint16_t endian_checker = 0x0001;
-  return *(char *)&endian_checker;
+  return *(const char *)&endian_checker;
 }
 
 static inline int cc_first_nonzero_uint16( uint64_t a )
@@ -1297,7 +1299,7 @@ static inline void *cc_vec_erase(
   CC_UNUSED( cc_hash_fnptr_ty, hash ),
   CC_UNUSED( cc_cmpr_fnptr_ty, cmpr ),
   cc_dtor_fnptr_ty el_dtor,
-  cc_dtor_fnptr_ty key_dtor,
+  CC_UNUSED( cc_dtor_fnptr_ty, key_dtor ),
   CC_UNUSED( cc_free_fnptr_ty, free_ )
 )
 {
@@ -1521,7 +1523,7 @@ typedef struct
 // Therefore cc_list_hdr( cntr )->r_end.prev always produces the associated placeholder's r_end, and ditto for
 // cc_list_hdr( cntr )->end.next.
 // Unfortunately, this means that r_end and end must be handled as special cases during inserts, splices, and iteration.
-const static cc_list_hdr_ty cc_list_placeholder = {
+static const cc_list_hdr_ty cc_list_placeholder = {
   0,
   {
     (cc_listnode_hdr_ty *)&cc_list_placeholder.r_end, // Circular link.
@@ -2451,12 +2453,16 @@ static inline void *cc_map_make_rehash(
           layout,
           hash
         ) ) )
-        {
-          free_( new_cntr );
-          cap *= 2;
-          continue;
-        }
+          break;
       }
+
+    // If a key could not be reinserted due to the displacement limit, double the bucket count and retry.
+    if( CC_UNLIKELY( new_cntr->size < cc_map_size( cntr ) ) )
+    {
+      free_( new_cntr );
+      cap *= 2;
+      continue;
+    }
 
     return new_cntr;
   }
