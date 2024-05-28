@@ -217,22 +217,22 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   On x86-64, this table's approximate memory overhead is 16 bytes per bucket and 56 bytes, plus `malloc` header and padding (assuming that the user allocates key-value pairs individually) and key-value padding, per key-value pair.
 
-<table class="uthash_diagram">
-<tr>
-<td></td>
-<td>
-{% highlight c %}
-typedef struct UT_hash_handle {
-   struct UT_hash_table *tbl;
-   void *prev;
-   void *next;
-   struct UT_hash_handle *hh_prev;
-   struct UT_hash_handle *hh_next;
-   const void *key;
-   unsigned keylen;
-   unsigned hashv;
-} UT_hash_handle;
-{% endhighlight %}
+    <table class="uthash_diagram">
+    <tr>
+    <td></td>
+    <td>
+    {% highlight c %}
+    typedef struct UT_hash_handle {
+       struct UT_hash_table *tbl;
+       void *prev;
+       void *next;
+       struct UT_hash_handle *hh_prev;
+       struct UT_hash_handle *hh_next;
+       const void *key;
+       unsigned keylen;
+       unsigned hashv;
+    } UT_hash_handle;
+    {% endhighlight %}
 </td>
 <td></td>
 </tr>

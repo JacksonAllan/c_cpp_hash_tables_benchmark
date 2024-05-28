@@ -32,8 +32,8 @@ The following hash-table libraries are included out-of-the-box.
 
 C++ Tables:
 
-* [ankerl::unordered_dense](https://github.com/martinus/unordered_dense) v4.1.2
 * [absl::flat_hash_map](https://github.com/abseil/abseil-cpp) v20240116.2
+* [ankerl::unordered_dense](https://github.com/martinus/unordered_dense) v4.1.2
 * [boost::unordered_flat_map](https://www.boost.org/doc/libs/1_85_0/libs/unordered/doc/html/unordered.html) v1.85.0
 * [emilib2::HashMap](https://github.com/ktprime/emhash/tree/master/thirdparty/emilib) ([emilib2o.hpp 434a205](https://github.com/ktprime/emhash/blob/434a20571a8d6b83b308ee0655a7076b5177e1fc/thirdparty/emilib/emilib2o.hpp))
 * [ska::bytell_hash_map](https://github.com/skarupke/flat_hash_map/blob/master/bytell_hash_map.hpp)
@@ -43,12 +43,13 @@ C++ Tables:
 C Tables:
 
 * cc_map from [CC](https://github.com/JacksonAllan/CC) v1.1.1
-* hmap from [STC](https://github.com/stclib/STC) v5.0 beta 4
 * khash from [klib](https://github.com/attractivechaos/klib) v0.2.8
 * DICT from [M\*LIB](https://github.com/P-p-H-d/mlib) v0.7.3
 * DICT_OA from [M\*LIB](https://github.com/P-p-H-d/mlib) v0.7.3
 * hm and sh from [stb_ds](https://github.com/nothings/stb/blob/master/stb_ds.h) v0.67
-* [uthash](https://troydhanson.github.io/uthash) v2.1.0
+* hmap from [STC](https://github.com/stclib/STC) v5.0 beta 4
+* [uthash](https://troydhanson.github.io/uthash) v2.3.0
+* [Verstable](https://github.com/JacksonAllan/Verstable) v2.1.0
 
 ## Built-in blueprints
 
