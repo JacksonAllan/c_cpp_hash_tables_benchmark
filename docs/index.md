@@ -237,7 +237,7 @@ typedef struct UT_hash_handle {
   <td></td>
   </tr>
   <tr>
-  <td colspan="3">The 56-byte struct that uthash requires to be embedded with every key-value pair.</td>
+  <td colspan="3">The 56-byte struct that <span class="table_label">uthash</span> requires to be embedded with every key-value pair.</td>
   </tr>
   </table>
 
