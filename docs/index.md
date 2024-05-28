@@ -35,12 +35,17 @@
   font-size: 0.85rem;
   border-collapse: collapse !important;
   border-style: hidden !important;
-  padding: 0 !important;
 }
 
 .uthash_diagram tr:first-child
 {
   text-align: center;
+}
+
+.uthash_diagram tr:nth-child(2) td
+.uthash_diagram tr:nth-child(2) td
+{
+  padding: 0 !important;
 }
 
 .uthash_diagram tr:nth-child(2) td:first-child,

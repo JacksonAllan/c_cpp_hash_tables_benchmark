@@ -12,7 +12,7 @@ Complete results from the benchmarks when run on my own computer, as well as mor
 
 ## Building
 
-Using GCC, compile with `g++ -I. -std=c++20 -static -O3 -DNDEBUG -Wall -Wpedantic main.cpp` from the master directory.
+Using GCC, compile with `g++ -I. -std=c++20 -static -O3 -DNDEBUG -Wall -Wpedantic main.cpp` from the root directory.
 
 ## Running
 
