@@ -136,7 +136,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
   This table, too, is an open-addressing table that stores hash-code fragments in a separate array and uses SIMD instructions to scan them for potential key matches multiple buckets at a time. However, it differs from <span class="table_label">absl::flat_hash_map</span> in several important ways. Firstly, keys are hashed not to individual buckets but to 15-bucket groups, which fill up contiguously from one end to the other:
 
   <table class="boost_absl_diagram" cellpadding="0" cellspacing="0">
-  <tr><td colspan="2">Clustering of key-value pairs in <span class="table_label">boost::unordered_flat_map</span> vs <span class="table_label">absl::flat_hash_map</span> at a load factor of 0.4375.</td></tr>
+  <tr><td colspan="2">Clustering of key-value pairs in <span class="table_label">boost::unordered_flat_map</span> vs <span class="table_label">absl::flat_hash_map</span> at a load factor of 0.4375</td></tr>
   <tr><td>boost</td><td><img src="boost_clustering.png"></td></tr>
   <tr><td>absl</td><td><img src="absl_clustering.png"></td></tr>
   </table>
@@ -225,7 +225,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   <table class="uthash_diagram">
   <tr>
-  <td colspan="3">The 56-byte struct that <span class="table_label">uthash</span> requires to be embedded with every key-value pair.</td>
+  <td colspan="3">The 56-byte struct that <span class="table_label">uthash</span> requires to be embedded with every key-value pair (code comments omitted)</td>
   </tr>
   <tr>
   <td></td>
@@ -13656,7 +13656,7 @@ I have consolidated the above results into a single heatmap that makes is easier
 
 ## Analysis
 
-The following section contains my analysis of the results, especially the 0-to-20,000,000-key graphs displayed above. Naturally, this and the next section are somewhat subjective. Hence, I encourage you to also examine the graphs and heatmap yourself, keeping in mind your specific needs and expected key counts.
+The following section contains my analysis of the results, especially the 0-to-20,000,000-key graphs displayed above. Naturally, this (and the next) section are somewhat subjective. Hence, I encourage you to also examine the graphs and heatmap yourself, keeping in mind your specific needs.
 
 * <span class="table_label">absl::flat_hash_map</span>: This table has very fast insertions unless the buckets are large. Its erasures of existing keys are fast but not among the top contenders, especially when we consider its reliance on tombstones. Its lookups and erasures of nonexisting keys are very fast. However, its lookups of existing keys are only moderately fast for large buckets and string keys and relatively slow for small buckets with integer keys. Its iteration is fast, albeit not as fast as the other SIMD tables, <span class="table_label">Verstable</span>, or—of course—the maps that store key-value pairs contiguously.
 
