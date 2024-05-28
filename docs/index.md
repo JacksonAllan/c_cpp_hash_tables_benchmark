@@ -26,6 +26,7 @@
 .boost_absl_diagram tr:first-child
 {
   text-align: center;
+  width: 100%;
 }
 
 .uthash_diagram td

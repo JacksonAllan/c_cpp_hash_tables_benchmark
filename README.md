@@ -8,7 +8,7 @@ The following is an example of one outputted graph:
 
 <picture><img src="example_graph.svg" alt="Example graph"></picture>
 
-Complete results from the benchmarks when run on my own computer, as well as more details about the benchmarks themselves, can be found in the [accompanying article].
+Complete results from the benchmarks when run on my own computer, as well as more details about the benchmarks themselves, can be found in the [accompanying article](https://jacksonallan.github.io/c_cpp_hash_tables_benchmark).
 
 ## Building
 
