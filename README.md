@@ -6,7 +6,7 @@ The benchmarks measure the speed of inserting keys, replacing keys, looking up e
 
 The following is an example of one outputted graph:
 
-<// picture><img src="example_graph.svg" alt="Example graph"></picture>
+<picture><img src="example_graph.svg" alt="Example graph"></picture>
 
 Complete results from the benchmarks when run on my own computer, as well as more details about the benchmarks themselves, can be found in the [accompanying article].
 
