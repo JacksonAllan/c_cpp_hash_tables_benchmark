@@ -1067,19 +1067,6 @@ void flush_cache()
   for( auto itr = buffer.begin(); itr != buffer.end(); ++itr )
     do_not_optimize += *itr;
 }
-
-/*
-template< typename shim_void, typename table >
-std::enable_if_t< std::same_as< shim_void, boost_unordered_flat_map< void > > > foo( table &t )
-{
-  std::cout << t.size() / (double)t.bucket_count() << " " << t.load_factor() << ", " << (double)t.bucket_count() << "\n";
-}
-
-template< typename shim_void, typename table >
-std::enable_if_t< !std::same_as< shim_void, boost_unordered_flat_map< void > > > foo( table &t )
-{
-}
-*/
  
 // Actual benchmarking function.
 template< template< typename > typename shim, typename blueprint >void benchmark( unsigned int run )
@@ -1120,8 +1107,6 @@ template< template< typename > typename shim, typename blueprint >void benchmark
       ++i;
       if( ++j == KEY_COUNT_MEASUREMENT_INTERVAL )
       {
-        // foo<shim<void>, decltype( shim< blueprint >::create_table() )>( table );
-
         results< shim, blueprint, insert_nonexisting >( run, i / KEY_COUNT_MEASUREMENT_INTERVAL - 1 ) =
           std::chrono::duration_cast< std::chrono::microseconds >(
             std::chrono::high_resolution_clock::now() - start
