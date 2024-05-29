@@ -59,12 +59,9 @@
   display: none !important;
 }
 </style>
+# An Extensive Benchmark of C and C++ Hash Tables
 
-<mark>DRAFT DRAFT DRAFT</mark>
-
-# An Extensive Benchmark of C (and Some C++) Hash Tables
-
-**Jackson Allan** · <mark>??</mark> May 2024
+**Jackson Allan** · 29 May 2024
 
 ## Introduction: Why Another Hash-Table Benchmark?
 
@@ -155,7 +152,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
 * [<span class="table_label">ska::bytell_hash_map</span>](https://github.com/skarupke/flat_hash_map/blob/master/bytell_hash_map.hpp):
 
-  This table is the [culmination](https://probablydance.com/2018/05/28/a-new-fast-hash-table-in-response-to-googles-new-fast-hash-table) of its author's experiments with various hash-table designs, including Robin Hood and SIMD-accelerated tables. It is documented most thoroughly by a [presentation](https://www.youtube.com/watch?v=M2fKMP47slQ) he delivered. The table is a hybrid of open addressing and [separate chaining](https://en.wikipedia.org/wiki/Hash_table#Separate_chaining). Keys overflowing from one bucket are stored in otherwise vacant buckets in the same array and chained together using 7-bit "jump distances" (indices into a hard-coded array of possible distances, in terms of buckets, to the next key in the chain). Groups of this metadata—i.e. 7-bit jump distances coupled with 1-bit flags—are stored interspersed with groups of buckets (every 16 bytes of metadata is followed by the 16 corresponding buckets). This design shares similarities with an older technique called [coalesced hashing](https://en.wikipedia.org/wiki/Coalesced_hashing), except that the chains do not coalesce.
+  This table is the [culmination](https://probablydance.com/2018/05/28/a-new-fast-hash-table-in-response-to-googles-new-fast-hash-table) of its author's experiments with various hash-table designs, including Robin Hood and SIMD-accelerated tables. It is documented most thoroughly by a [presentation](https://www.youtube.com/watch?v=M2fKMP47slQ) he delivered. The table is a hybrid of open addressing and [separate chaining](https://en.wikipedia.org/wiki/Hash_table#Separate_chaining). Keys-value pairs overflowing from one bucket are stored in otherwise vacant buckets in the same array and chained together using 7-bit "jump distances" (indices into a hard-coded array of possible distances, in terms of buckets, to the next key-value pair in the chain). Groups of this metadata—i.e. 7-bit jump distances coupled with 1-bit flags—are stored interspersed with groups of buckets (every 16 bytes of metadata is followed by the 16 corresponding buckets). This design shares similarities with an older technique called [coalesced hashing](https://en.wikipedia.org/wiki/Coalesced_hashing), except that the chains do not coalesce.
 
   This table's approximate memory overhead is one byte, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
@@ -249,7 +246,7 @@ typedef struct UT_hash_handle {
 
 * <a name="verstable_description"></a>[<span class="table_label">Verstable</span>](https://github.com/JacksonAllan/Verstable) v2.1.0:
 
-  Like <span class="table_label">ska::bytell_hash_map</span>, this table is a hybrid of open addressing and separate chaining that stores keys overflowing from one bucket in otherwise vacant buckets of the flat buckets array. However, rather than chaining key-value pairs using a 7-bit index into an array of "jump distances", it does so using an 11-bit integer denoting quadratic displacement. It also stores a 4-bit fragment of each key's hash code to limit key comparisons. Hence, it uses two bytes of metadata per bucket, rather than the one byte used by <span class="table_label">ska::bytell_hash_map</span>. The metadata is stored in a separate array, rather than interspersed with groups of buckets.
+  Like <span class="table_label">ska::bytell_hash_map</span>, this table is a hybrid of open addressing and separate chaining that stores key-value pairs overflowing from one bucket in otherwise vacant buckets of the flat buckets array. However, rather than chaining key-value pairs using a 7-bit index into an array of "jump distances", it does so using an 11-bit integer denoting quadratic displacement. It also stores a 4-bit fragment of each key's hash code to limit key comparisons. Hence, it uses two bytes of metadata per bucket, rather than the one byte used by <span class="table_label">ska::bytell_hash_map</span>. The metadata is stored in a separate array, rather than interspersed with groups of buckets.
 
   This table's approximate memory overhead is two bytes, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
