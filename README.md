@@ -8,7 +8,7 @@ The following is an example of one outputted graph:
 
 <picture><img src="example_graph.svg" alt="Example graph"></picture>
 
-Complete results from the benchmarks when run on my own computer, as well as more details about the benchmarks themselves, can be found in the [accompanying article](https://jacksonallan.github.io/c_cpp_hash_tables_benchmark).
+Complete results from the benchmarks when run on my computer, as well as more details about the benchmarks themselves, can be found in the [accompanying article](https://jacksonallan.github.io/c_cpp_hash_tables_benchmark).
 
 ## Building
 
@@ -18,7 +18,7 @@ Using GCC, compile with `g++ -I. -std=c++20 -static -O3 -DNDEBUG -Wall -Wpedanti
 
 Close background processes, lock your CPU's frequency, and then run the executable. Under the out-of-the-box configuration, the benchmarks take approximately three hours to complete on my AMD Ryzen 7 5800H with the CPU frequency locked at 90%.
 
-The resulting graphs and heatmap are outputted as a HMTL file, and the raw data is outputted as a CSV file. Both of these files are named with a GMT timestamp and placed in the current working directory.
+The resulting graphs and heatmap are outputted as an HTML file, and the raw data is outputted as a CSV file. Both of these files are named with a GMT timestamp and placed in the current working directory.
 
 The graphs are interactive. Hover over a label to highlight the associated plot, and click the label to toggle the plot's visibility. The graphs automatically scale to the visible plots.
 
@@ -28,7 +28,7 @@ To modify global settings, including the total key count, the measurement freque
 
 ## Built-in tables
 
-The following hash-table libraries are included out-of-the-box.
+The following hash-table libraries are included out of the box.
 
 C++ Tables:
 
