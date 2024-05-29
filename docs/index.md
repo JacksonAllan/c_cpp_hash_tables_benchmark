@@ -59,7 +59,7 @@
   display: none !important;
 }
 </style>
-<link rel="icon" href="images/favicon.svg" sizes="any" type="image/svg+xml">
+<link rel="icon" href="favicon.svg" sizes="any" type="image/svg+xml">
 # An Extensive Benchmark of C and C++ Hash Tables
 
 **Jackson Allan** · 29 May 2024
