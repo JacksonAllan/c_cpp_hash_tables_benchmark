@@ -1,3 +1,4 @@
+<link rel="icon" href="images/favicon.svg" sizes="any" type="image/svg+xml">
 ## Introduction
 
 This repository contains a comparative, extendible benchmarking suite for C and C++ hash-table libraries.
