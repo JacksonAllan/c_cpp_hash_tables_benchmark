@@ -1,4 +1,20 @@
 <style>
+h1
+{
+  border-left: 1px solid #eaecef;
+  position: relative;
+  padding-left: calc( 50px + 0.5ch );
+}
+
+h1 svg
+{
+  width: 50px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+}
+
 .table_label
 {
   font-weight: 500;
@@ -59,9 +75,16 @@
   display: none !important;
 }
 </style>
-# An Extensive Benchmark of C and C++ Hash Tables
+<h1>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 33 32" preserveAspectRatio="none">
+  <polyline stroke="#ff5757" stroke-linejoin="round" fill="none" stroke-width="3" vector-effect="non-scaling-stroke" points="0 32 6.4 21.44 12.8 24.96 19.2 10.88 25.6 17.92 32 0"></polyline>
+  <polyline stroke="#38b6ff" stroke-linejoin="round" fill="none" stroke-width="3" vector-effect="non-scaling-stroke" points="0 32 6.4 25.0304 12.8 27.3536 19.2 18.0608 25.6 22.7072 32 10.88"></polyline>
+  <polyline stroke="#ffde59" stroke-linejoin="round" fill="none" stroke-width="3" vector-effect="non-scaling-stroke" points="0 32 6.4 28.5152 12.8 29.6768 19.2 25.0304 25.6 27.3536 32 21.44"></polyline>
+</svg>
+An Extensive Benchmark of C and C++ Hash Tables
+</h1>
 
-**Jackson Allan** · 29 May 2024
+**Jackson Allan** · Published 29 May 2024 · Updated 2 June 2024
 
 ## Introduction: Why Another Hash-Table Benchmark?
 
@@ -77,7 +100,7 @@ The benchmarks include three hash table configurations designed to measure the t
 
 * The _64-bit integer key, 448-bit value_ benchmarks test how the tables perform when the hash and comparison functions are cheap, traversing buckets is expensive (one cache miss per bucket on architectures with 64-byte cache lines), and moving key-value pairs is expensive. These benchmarks disadvantage tables that do not store metadata in a separate array (or do so but access the buckets array with every probe anyway to check the key) and that move key-value pairs around often (e.g. [Robin Hood](https://www.sebastiansylvan.com/post/robin-hood-hashing-should-be-your-default-hash-table-implementation) hash tables).
 
-* The _16-char c-string key, 64-bit value_ benchmarks test how the tables perform when the hash and comparison functions are expensive. These benchmarks disadvantage tables that lack a metadata mechanism to limit key comparisons or that rehash keys often.
+* The _16-char c-string key, 64-bit value_ benchmarks test how the tables perform when the hash and comparison functions are expensive. The keys that the tables store are pointers into an array of contiguously allocated strings. These benchmarks disadvantage tables that lack a metadata mechanism to limit key comparisons or that rehash keys often.
 
 All the tables benchmarked are configured to use the same hash functions, namely the [MurmurHash3 finalizer](https://zimbry.blogspot.com/2011/09/better-bit-mixing-improving-on.html) for integer keys and [FNV-1a](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function) for string keys.
 
@@ -142,7 +165,7 @@ The complete code of the benchmarks is available [here](https://github.com/Jacks
 
   This table's approximate memory overhead is 1.07 bytes, plus key-value padding, per bucket, in addition to the size of a key-value pair per vacant bucket.
 
-  For the sake of easy distribution with this benchmarking project, I have opted to use an [amalgamated single-header version](https://github.com/MikePopoloski/boost_unordered) of this table provided by a third party.
+  For the sake of easy distribution with this benchmarking project, I have opted to use an [amalgamated single-header version](https://github.com/MikePopoloski/boost_unordered) of this table provided by a third party. However, <span class="table_label">Boost.Unordered</span>, the <span class="table_label">Boost</span> module that contains this table, can also be obtained and installed separately from the rest of the library straight from the official sources.
 
 * [<span class="table_label">emilib2::HashMap</span>](https://github.com/ktprime/emhash/tree/master/thirdparty/emilib):
 
@@ -262,7 +285,7 @@ As I ran the benchmarks 14 times for every key count, each data point shown in t
 
 The graphs are interactive. Hover over a table's label to highlight the associated plot, and click it to toggle the plot's visibility. The graphs automatically scale to the visible plots.
 
-Displayed below are the results for 0 to 20,000,000 keys.
+Displayed below are the graphs for 0 to 20,000,000 keys. Click [here](#heatmap) to skip to the heatmap summarizing the data shown in these graphs.
 
 <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='100%' viewBox='0 0 1002 618' style='background-color: white;'>
   <style>
@@ -12949,7 +12972,7 @@ Displayed below are the results for 0 to 20,000,000 keys.
   </foreignObject>
 </svg>
 
-I have consolidated the results displayed above into a single heatmap that makes it easier to compare tables across benchmarks. Each cell contains the total of the averaged recordings that the corresponding table registered in the corresponding benchmark (except for the _Total time to insert N nonexisting keys_ benchmark, which is already cumulative), normalized to the result of the table that performed the fastest in that benchmark. A value of 2.00, for example, indicates that the table is two times slower than the best performer. The color scale spans from 1.00 to 10.00 (all results that are 10 or more times slower than the best in the benchmark are colored black).
+<a name="heatmap">I have consolidated the results displayed above into a single heatmap that makes it easier to compare tables across benchmarks. Each cell contains the total of the averaged recordings that the corresponding table registered in the corresponding benchmark (except for the _Total time to insert N nonexisting keys_ benchmark, which is already cumulative), normalized to the result of the table that performed the fastest in that benchmark. A value of 2.00, for example, indicates that the table is two times slower than the best performer. The color scale spans from 1.00 to 10.00 (all results that are 10 or more times slower than the best in the benchmark are colored black).
 
 <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='100%' viewBox='0 0 1002 738' style='background-color: white;'>
   <style>
@@ -13655,7 +13678,7 @@ I have consolidated the results displayed above into a single heatmap that makes
 
 Below is my analysis of the results, especially the 0-to-20,000,000-key graphs displayed above. Naturally, this (and the next) section is somewhat subjective. Hence, I encourage readers seeking a hash-table library to also examine the graphs and heatmaps themselves, bearing in mind their specific needs.
 
-* <span class="table_label">absl::flat_hash_map</span>: This table has very fast insertions unless the buckets are large. Its erasure of existing keys is fast but not among the top contenders, especially when we consider its reliance on tombstones. Its lookups and erasures of nonexisting keys are very fast. However, its lookups of existing keys are only moderately fast for large buckets and string keys and relatively slow for small buckets with integer keys. Its iteration is fast, albeit not as fast as the other SIMD tables, <span class="table_label">Verstable</span>, or—of course—the tables that store key-value pairs contiguously.
+* <span class="table_label">absl::flat_hash_map</span>: This table has very fast insertions unless the buckets are large. Its erasure of existing keys is fast but not among the top contenders, especially when we consider its reliance on tombstones. Its lookups and erasures of nonexisting keys are very fast. However, its lookups and replacements of existing keys are only moderately fast for large buckets and string keys and relatively slow for small buckets with integer keys (although they are far more competitive in the 0-200,000-key benchmarks). Its iteration is fast, albeit not as fast as the other SIMD tables, <span class="table_label">Verstable</span>, or—of course—the tables that store key-value pairs contiguously.
 
 * <span class="table_label">ankerl::unordered_dense</span>: This table has fast lookups, particularly when its load factor is lower than its default limit of 0.8. Its insertions, however, are only moderately fast for large buckets and string keys and slow for integer keys with small buckets. For lookups and erasures of nonexisting keys, it is faster than the other Robin Hood table (<span class="table_label">tsl::robin_map</span>) and the conventional linear- and quadratic-probing open-addressing tables. Its performance in most benchmarks is load-factor dependent but less so than the performance of those other tables. Predictably, its iteration is extremely fast: because key-value pairs are stored contiguously, iteration is tantamount to iterating over an array.
 
@@ -13671,7 +13694,7 @@ Below is my analysis of the results, especially the 0-to-20,000,000-key graphs d
 
 * <span class="table_label">cc_map</span> from <span class="table_label">CC</span>: _Disclaimer: I am the author of this table_. Since <span class="table_label">CC</span> implements the same hash-table design as <span class="table_label">Verstable</span>, its results are similar to <span class="table_label">Verstable</span>'s results, and the same [comments](#verstable_analysis) apply. However, its iteration—though fast—is somewhat slower than <span class="table_label">Verstable</span>'s iteration. This is because iterators in <span class="table_label">CC</span> are raw pointers to buckets, rather than a struct containing both a pointer to a bucket and a pointer to its corresponding metadata. Hence, <span class="table_label">cc_map</span> must perform an extra calculation per iteration to locate the current bucket's metadata.
 
-* <span class="table_label">khash</span> from <span class="table_label">klib</span>: This table has reasonably good insertion speed, particularly for integer keys. Its erasure of existing keys is fast (but relies on tombstones). However, its lookups of existing keys are relatively slow, as are its lookups and erasures of nonexisting keys. Its iteration is also slow for an open-addressing table.
+* <span class="table_label">khash</span> from <span class="table_label">klib</span>: This table has reasonably good insertion speed, particularly for integer keys. Its erasure of existing keys is fast (but relies on tombstones). However, its lookups of existing keys are relatively slow, as are its lookups and erasures of nonexisting keys. Its iteration is also rather slow for an open-addressing table.
 
 * <span class="table_label">DICT</span> from <span class="table_label">M\*LIB</span>: This table has fast insertions (especially for string keys and large buckets) and extremely fast lookups of existing keys. It is similarly fast for erasing existing keys (although it relies on tombstones). However, it is rather slow for looking up or erasing nonexisting keys. Its iteration is also 2-3x slower than the slowest among the other open-addressing tables, despite the storage of key-value pairs in a separate array. This is because the potential presence of gaps in the key-value-pairs array precludes iterating over it directly and without reference to the buckets array, which stores eight or 16 bytes per bucket and is therefore not especially cache-friendly.
 
@@ -13712,3 +13735,5 @@ I would like to thank [Joaquín M López Muñoz](https://github.com/joaquintides
 ## Discussion
 
 Comments on this article belong [here](https://github.com/JacksonAllan/c_cpp_hash_tables_benchmark/discussions/1).
+
+The article was also discussed on Reddit at [r/C_Programming](https://www.reddit.com/r/C_Programming/comments/1d3i962/an_extensive_benchmark_of_c_and_c_hash_tables/) and [r/cpp](https://old.reddit.com/r/cpp/comments/1d418aw/an_extensive_benchmark_of_c_and_c_hash_tables/).
