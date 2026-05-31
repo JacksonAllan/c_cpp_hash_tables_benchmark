@@ -1002,7 +1002,7 @@ std::default_random_engine random_number_generator( std::chrono::steady_clock::n
 // Function for providing unique keys for a given blueprint in random order.
 // Besides the KEY_COUNT keys to be inserted, it also provides an extra KEY_COUNT / KEY_COUNT_MEASUREMENT_INTERVAL *
 // 1000 keys for testing failed look-ups.
-template< typename blueprint > const blueprint::key_type &shuffled_unique_key( size_t index )
+template< typename blueprint > const typename blueprint::key_type &shuffled_unique_key( size_t index )
 {
   static auto keys = []()
   {
